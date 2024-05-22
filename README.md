@@ -2,7 +2,7 @@
 OS Mini Operating System 구현
 
 # Developers
-Lead : 진성 (진성님 성이 뭐죠,,?😅), 나윤주, 박채린, 이용희, 유연우
+Lead : 진성 (진성님 성이 뭐죠,,?😅)박진성입니다, 나윤주, 박채린, 이용희, 유연우
 
 # 🎮stack
 ![linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
