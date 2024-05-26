@@ -1,41 +1,41 @@
 #include "../include/main.h"
 int ls_cnt = 1;
-int ls(DirectoryTree* dirTree, char* cmd)
+int ls(DirectoryTree* dirTree, char* command)
 {
     DirectoryNode* tmpNode = NULL;
     pthread_t threadArr[MAX_THREAD];
     ThreadTree threadTree[MAX_THREAD];
-    char* command;
+    char* cmd;
     int option = 0;
     int thread_cnt = 0;
 
-    if (cmd == NULL) {
+    if (command == NULL) {
         ListDir(dirTree, 0);
         return 0;
     }
-    if (cmd[0] == '-') {    //옵션이 있을 경우
-        if (strcmp(cmd, "-l") == 0) {      //옵션이 -l일 경우
+    if (command[0] == '-') {    //옵션이 있을 경우
+        if (strcmp(command, "-l") == 0) {      //옵션이 -l일 경우
             option = 2;
-            command = strtok(NULL, " ");
-            if (command == NULL) {
+            cmd = strtok(NULL, " ");
+            if (cmd == NULL) {
                 ListDir(dirTree, 2);
             }
         }
-        else if (strcmp(cmd, "-a") == 0) {      //옵션이 -a일 경우
+        else if (strcmp(command, "-a") == 0) {      //옵션이 -a일 경우
             option = 1;
-            command = strtok(NULL, " ");
-            if (command == NULL) {
+            cmd = strtok(NULL, " ");
+            if (cmd == NULL) {
                 ListDir(dirTree, 1);
             }
         }
-        else if (strcmp(cmd, "-al") == 0 || strcmp(cmd, "-la") == 0) {       //옵션이 -al, -la일 경우
+        else if (strcmp(command, "-al") == 0 || strcmp(command, "-la") == 0) {       //옵션이 -al, -la일 경우
             option = 3;
-            command = strtok(NULL, " ");
-            if (command == NULL) {
+            cmd = strtok(NULL, " ");
+            if (cmd == NULL) {
                 ListDir(dirTree, 3);
             }
         }
-        else if (strcmp(cmd, "--help") == 0) {
+        else if (strcmp(command, "--help") == 0) {
             printf("Usage: ls [OPTION]... [FILE]...\n");
             printf("List information about the FILEs (the current directory by default).\n");
             printf("Sort entries alphabetically if none of -cftuvSUX nor --sort is specified.\n\n");
@@ -72,23 +72,23 @@ int ls(DirectoryTree* dirTree, char* cmd)
             return -1;
         }
         else {      //다른 옵션일 경우 에러
-            command = strtok(cmd, "-");
-            printf("ls: invalid option -- '%s'\n", command);
+            cmd = strtok(command, "-");
+            printf("ls: invalid option -- '%s'\n", cmd);
             printf("Try 'ls --help' for more information.\n");
             return -1;
         }
     }
     else {
-        command = strtok(NULL, " ");
+        cmd = strtok(NULL, " ");
         threadTree[thread_cnt].threadTree = dirTree;
         threadTree[thread_cnt].option = option;
-        threadTree[thread_cnt++].cmd = cmd;
+        threadTree[thread_cnt++].command = command;
     }
-    while(command != NULL){
+    while(cmd != NULL){
         threadTree[thread_cnt].threadTree = dirTree;
         threadTree[thread_cnt].option = option;
-        threadTree[thread_cnt++].cmd = command;
-        command = strtok(NULL, " ");
+        threadTree[thread_cnt++].command = cmd;
+        cmd = strtok(NULL, " ");
         ls_cnt++;
     }
     for (int i = 0; i < thread_cnt; i++) {
@@ -102,18 +102,18 @@ int ls(DirectoryTree* dirTree, char* cmd)
 void* ls_thread(void *arg) {
     ThreadTree *threadTree = (ThreadTree *)arg;
     DirectoryTree *dirTree = threadTree->threadTree;
-    char *cmd = threadTree->cmd;
+    char *command = threadTree->command;
     DirectoryNode *tmpNode = NULL;
     int option = threadTree->option;
     int check_exist;
 
     tmpNode = dirTree->current;
     if (ls_cnt > 1)
-        printf("%s:\n", cmd);
-    check_exist = MovePath(dirTree, cmd);
+        printf("%s:\n", command);
+    check_exist = MovePath(dirTree, command);
     if (check_exist)
     {
-        printf("ls: '%s': No such file or direcory.\n", cmd);
+        printf("ls: '%s': No such file or direcory.\n", command);
         return -1;
     }
     ListDir(dirTree, option);
@@ -223,7 +223,7 @@ int ListDir(DirectoryTree* dirTree, int option)
                     }
                 }
                 printf("%c", dirTree->current->Parent->type);
-                PrintPermission(dirTree->current->Parent);
+               PrintPermission(dirTree->current->Parent);
                 printf("%3d", ls_cnt);
                 printf("   ");
                 printf("%-5s%-5s", GetUID(dirTree->current->Parent), GetGID(dirTree->current->Parent));

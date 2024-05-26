@@ -1,57 +1,59 @@
 #include "../include/main.h"
 
-int pwd(DirectoryTree* dirTree, Stack* dirStack, char* cmd)
-{
-    if (!cmd)
-        PrintPath(dirTree, dirStack);
-    else if(cmd[0] == '-'){
-        if(strcmp(cmd, "--help") == 0){
-            printf("pwd: pwd [-LP]\n");
-            printf("  Print the name of the current working directory.\n\n");
-            
-            printf("  Options:\n");
-            printf("    -L\t print the value of $PWD if it names the current working\n");
-            printf("  \t directory\n");
-            printf("    -P\t print the physical direcrtory, without any symbolic links\n\n");
-            
-            printf("  By default, 'pwd' behaves as if '-L' were specified.\n\n");
-            
-            printf("  Exit status:\n");
-            printf("  Returns 0 unless an invalid option is given or the current directory\n");
-            printf("  cannot be read.\n");
-        }
-        else{
-            printf("-bash: pwd: %s: invalid option\n", cmd);
-            printf("pwd: usage: pwd [-LP]\n");
-        }
-        return -1;
+char* PrintDirectoryPath(DirectoryTree* dirTree) {
+    DirectoryNode* current = dirTree->current;
+    char* path = (char*)malloc(MAX_DIR * 2); // 동적 메모리 할당
+    if (path == NULL) {
+        return NULL; // 메모리 할당 실패 시 NULL 반환
     }
-    else{
-        printf("pwd: too many arguments.\n");
-        return -1;
+    strcpy(path, "/"); // 루트 디렉토리로 초기화
+
+    char* segments[MAX_DIR]; // 디렉토리 이름 저장 포인터
+    int segmentCount = 0; // 세그먼트 수
+
+    // 루트 디렉토리에 도달할 때까지 반복
+    while (current != dirTree->root) {
+        segments[segmentCount++] = current->name; // 디렉토리 이름을 배열에 저장
+        current = current->Parent; // 상위 디렉토리로 이동
     }
-    return 0;
+
+    // 경로를 역순으로 연결하여 최종 경로 구성
+    for (int i = segmentCount - 1; i >= 0; --i) {
+        strncat(path, segments[i], MAX_DIR * 2 - strlen(path) - 1);
+        if (i > 0) { // 마지막 세그먼트 뒤에는 슬래시를 추가하지 않음
+            strncat(path, "/", MAX_DIR * 2 - strlen(path) - 1);
+        }
+    }
+
+    return path;
 }
-
-int PrintPath(DirectoryTree* dirTree, Stack* dirStack)
-{
-    DirectoryNode* tmpNode = NULL;
-
-    tmpNode = dirTree->current;
-    if(tmpNode == dirTree->root){
-        printf("/");
+void pwd(DirectoryTree* dirTree, char* cmd) {
+    if (cmd == NULL || strcmp(cmd, "") == 0)
+    {
+        // 기본 명령어 pwd
+        PrintDirectoryPath(dirTree);
     }
-    else{
-        while(tmpNode->Parent != NULL){
-            Push(dirStack, tmpNode->name);
-            tmpNode = tmpNode->Parent;
+    else if (cmd[0] == '-')
+    {
+        if (strcmp(cmd, "-") == 0 || strcmp(cmd, "--") == 0)
+        {
+            // 기본 명령어 pwd, pwd -, pwd -- 모두 현재 경로 출력
+            PrintDirectoryPath(dirTree);
         }
-        while(IsEmpty(dirStack) == 0){
-            printf("/");
-            printf("%s",Pop(dirStack));
+        else if (strcmp(cmd, "--help") == 0) {
+            // pwd --help
+            printf("Usage: pwd [OPTION]\n");
+            printf("    Print the name of the current working directory.\n\n");
+            printf("    Options:\n");
+            printf("       -         print the name of the current working directory\n");
+            printf("       --        print the name of the current working directory\n");
+            printf("       --help    display this help and exit\n");
+        }
+        else {
+            // 잘못된 옵션 에러 메시지 출력 ex)pwd -aa
+            printf("bash: pwd: %s: invalid option\n", cmd);
+            printf("Try 'pwd --help' for more information.\n");
         }
     }
-    printf("\n");
-
-    return 0;
+    else  PrintDirectoryPath(dirTree); //pwd 에 무엇이오든지 상관 x 현재 디렉토리 위치 출력
 }

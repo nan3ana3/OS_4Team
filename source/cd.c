@@ -1,122 +1,222 @@
 #include "../include/main.h"
 
-int cd(DirectoryTree* dirTree, char* cmd)
-{
-    DirectoryNode* tmpNode = NULL;
-    char tmp[MAX_DIR];
-    int check_exist;
+char previousPath[MAX_DIR * 2] = ""; // ÀÌÀü °æ·Î¸¦ ÀúÀåÇÒ º¯¼ö
 
-    if(cmd == NULL){    //ìžì‹ ì˜ í™ˆë””ë ‰í† ë¦¬ë¡œ ì´ë™
-        strcpy(tmp, usrList->current->dir);
-        MovePath(dirTree, tmp);
-    }
-    else if(cmd[0] == '-'){     //ì˜µì…˜ì´ ìžˆì„ ê²½ìš°
-        if(strcmp(cmd, "--help") == 0){     //--help ìž…ë ¥ì‹œ
-            printf("cd: cd [-L|[-P [-e]] [-@]] [dir]\n");
-            printf("    Change the shell working directory.\n\n");
-            
-            printf("    Change the current directory to DIR. The default DIR is the value of the\n");
-            printf("    HOME shell variable.\n\n");
-            
-            printf("    The variable CDPATH defines the search path for the directory containing\n");
-            printf("    DIR. Alternative directory names in CDPATH are separated by a colon (:).\n");
-            printf("    A null directory name is the same as the current directory. If DIR begins\n");
-            printf("    with a slash (/), then CDPATH is not used.\n\n");
-            
-            printf("    If the directory is not found, and the shell option 'cdable_vars' is set,\n");
-            printf("    the word is assumed to be a variable name. If that variable has value,\n");
-            printf("    its value is used for DIR.\n\n");
-            
-            printf("    Options:\n");
-            printf("        --help\t display this help and exit\n\n");
-            
-            printf("The default is to follow symbolic links, as if '-L' were specified.\n");
-            printf("'..' is processed by removing the immediately previous pathname component\n");
-            printf("back to a slash or the beginning of DIR.\n\n");
-            
-            printf("Exit Status:\n");
-            printf("Returns 0 if the directory is changed, and if $PWD is set successfully when\n");
-            printf("-P is used; non-zero otherwise.\n");
-        }
-        else{
-            cmd = strtok(cmd, "-");     //ê·¸ ì™¸ì˜ ì˜µì…˜ë“¤ ì—ëŸ¬ì²˜ë¦¬
-            printf("cd: invalid option -- '%s'\n", cmd);
-            printf("cd: usage: cd [-L|[-P [-e]] [-@]] [dir]\n");
-        }
-        return -1;
-    }
-    else{   //ì˜µì…˜ ì—†ì„ ê²½ìš°
-        tmpNode = IsExistDir(dirTree, cmd, 'd');
-        if(tmpNode != NULL){
-            if(HasPermission(tmpNode, 'x') != 0){       //ì ‘ê·¼ê¶Œí•œì´ ê±°ë¶€ë˜ì–´ ìžˆì„ ê²½ìš°
-                printf("cd: %s: Permission denied\n", cmd);
-                return -1;
-            }
-        }
-        tmpNode = IsExistDir(dirTree, cmd,  'f');
-        if(tmpNode != NULL){        //ë””ë ‰í† ë¦¬ê°€ ì•„ë‹ ê²½ìš°
-            printf("cd: %s: Not a directory\n", cmd);
-            return -1;
-        }
-        check_exist = MovePath(dirTree, cmd);
-        if(check_exist != 0)        //íŒŒì¼ì´ ì—†ì„ ê²½ìš°
-            printf("cd: %s: No such file or directory\n", cmd);
-    }
-    return 0;
-}
+////permission.h
+//int CheckPermission(const int* permissions, char pms, int index) {
+//    switch (pms) {
+//    case 'r': return permissions[index] ? 0 : -1; // ÀÐ±â ±ÇÇÑ È®ÀÎ
+//    case 'w': return permissions[index + 1] ? 0 : -1; // ¾²±â ±ÇÇÑ È®ÀÎ
+//    case 'x': return permissions[index + 2] ? 0 : -1; // ½ÇÇà ±ÇÇÑ È®ÀÎ
+//    default: return -1; // Àß¸øµÈ ±ÇÇÑ ¿äÃ»
+//    }
+//}
+////permission.h
+//int HasPermission(DirectoryNode* dirNode, char pms)
+//{
+//    // userList³ª current »ç¿ëÀÚ°¡ NULLÀÎÁö È®ÀÎ
+//    if (userList == NULL || userList->current == NULL) {
+//        return -1; // ÀûÀýÇÑ ¿¡·¯ ÄÚµå ¹ÝÈ¯
+//    }
+//
+//    // °ü¸®ÀÚ (·çÆ® »ç¿ëÀÚ)´Â ¸ðµç ±ÇÇÑÀ» °¡Áü
+//    if (userList->current->UserID == 0) {
+//        return 0;
+//    }
+//    // ¼ÒÀ¯ÀÚÀÇ ±ÇÇÑÀ» È®ÀÎ
+//    if (userList->current->UserID == dirNode->UserID) {
+//        return CheckPermission(dirNode->permission, pms, 0);
+//    }
+//
+//    // ±×·ìÀÇ ±ÇÇÑÀ» È®ÀÎ
+//    if (userList->current->GroupID == dirNode->GroupID) {
+//        return CheckPermission(dirNode->permission, pms, 3);
+//    }
+//
+//    // ±âÅ¸ »ç¿ëÀÚÀÇ ±ÇÇÑÀ» È®ÀÎ
+//    return CheckPermission(dirNode->permission, pms, 6);
+//}
+//
+//DirectoryNode* FindDirectoryNode(DirectoryTree* dirTree, char* dirName, char type) {
+//    DirectoryNode* currentNode = dirTree->current->LeftChild; // ÇöÀç µð·ºÅä¸®ÀÇ Ã¹ ¹øÂ° ÀÚ½Ä ³ëµå·Î ¼³Á¤
+//
+//    // ¸ðµç ÀÚ½Ä ³ëµå¸¦ Å½»ö
+//    while (currentNode != NULL) {
+//        // µð·ºÅä¸® ÀÌ¸§°ú À¯ÇüÀÌ ÀÏÄ¡ÇÏ¸é ³ëµå¸¦ ¹ÝÈ¯
+//        if (strcmp(currentNode->name, dirName) == 0 && currentNode->type == type) {
+//            return currentNode;
+//        }
+//        // ´ÙÀ½ ÇüÁ¦ ³ëµå·Î ÀÌµ¿
+//        currentNode = currentNode->RightSibling;
+//    }
+//    // ÀÏÄ¡ÇÏ´Â ³ëµå¸¦ Ã£Áö ¸øÇÏ¸é NULL ¹ÝÈ¯
+//    return NULL;
+//}
 
-int Movecurrent(DirectoryTree* dirTree, char* dirPath)      //íŒŒì¼ì´ ìžˆëŠ” ë””ë ‰í† ë¦¬ë¡œ ì´ë™
-{
-    DirectoryNode* tmpNode = NULL;
 
-    if(strcmp(dirPath,".") == 0){
+int ChangeDirectory(DirectoryTree* dirTree, char* dirPath) {
+    // º¯¼ö ¼±¾ð
+    DirectoryNode* tempNode = NULL;
+    DirectoryNode* savedNode = dirTree->current;  // ÇöÀç µð·ºÅä¸® ³ëµå¸¦ ÀÓ½Ã º¯¼ö¿¡ ÀúÀå
+    char tempPath[MAX_DIR];
+    char* command = NULL;
+
+    // ÇöÀç µð·ºÅä¸® ('.')ÀÏ °æ¿ì: ¾Æ¹« ÀÛ¾÷µµ ÇÏÁö ¾ÊÀ½
+    if (strcmp(dirPath, ".") == 0) {
+        return 0;
     }
-    else if(strcmp(dirPath,"..") == 0){
-        if(dirTree->current != dirTree->root){
+
+    // »óÀ§ µð·ºÅä¸®·Î ÀÌµ¿ÇÏ´Â °æ¿ì ('..')
+    if (strcmp(dirPath, "..") == 0) {
+        if (dirTree->current != dirTree->root) { // ÇöÀç µð·ºÅä¸®°¡ ·çÆ® µð·ºÅä¸®°¡ ¾Æ´Ï¸é »óÀ§ µð·ºÅä¸®·Î ÀÌµ¿
             dirTree->current = dirTree->current->Parent;
         }
+        return 0;
     }
-    else{
-        tmpNode = IsExistDir(dirTree, dirPath, 'd');
-        if(tmpNode != NULL){
-            dirTree->current = tmpNode;
+
+    // °æ·Î¸¦ tempPath¿¡ º¹»ç
+    strncpy(tempPath, dirPath, MAX_DIR - 1); // ¹®ÀÚ¿­ º¹»ç
+    tempPath[MAX_DIR - 1] = '\0';
+
+    // ÃÖ»óÀ§ µð·ºÅä¸®ÀÏ °æ¿ì
+    if (strcmp(dirPath, "/") == 0) {
+        dirTree->current = dirTree->root; // ÇöÀç µð·ºÅä¸® = ·çÆ® µð·ºÅä¸®
+        return 0;
+    }
+
+    // Àý´ë °æ·ÎÀÎ °æ¿ì
+    if (dirPath[0] == '/') {
+        dirTree->current = dirTree->root; // ÇöÀç µð·ºÅä¸® = ·çÆ® µð·ºÅä¸®
+        command = strtok(tempPath + 1, "/"); // Ã¹¹øÂ° µð·ºÅä¸® ÀÌ¸§ ÃßÃâ
+    }
+    else {  // »ó´ë °æ·ÎÀÎ °æ¿ì
+        command = strtok(tempPath, "/"); // Ã¹¹øÂ° µð·ºÅä¸® ÀÌ¸§ ÃßÃâ
+    }
+
+    // °æ·Î¸¦ ÇÏ³ª¾¿ Å½»öÇÏ¸ç ÀÌµ¿
+    while (command != NULL) {
+        // ÇÏÀ§ µð·ºÅä¸®·Î ÀÌµ¿ÇÏ´Â °æ¿ì
+        tempNode = FindDirectoryNode(dirTree, command, 'd');// ÇØ´ç ÀÌ¸§ÀÇ µð·ºÅä¸®°¡ Á¸ÀçÇÏ¸é ÀÌµ¿
+        if (tempNode != NULL) {
+            dirTree->current = tempNode;
+        }
+        else {
+            // µð·ºÅä¸®°¡ Á¸ÀçÇÏÁö ¾ÊÀ» °æ¿ì
+            dirTree->current = savedNode; // ÇöÀç µð·ºÅä¸® º¹¿ø
+            return -1;
+        }
+        command = strtok(NULL, "/");
+    }
+
+    return 0;
+}
+
+////pwd.h
+//char* PrintDirectoryPath(DirectoryTree* dirTree) {
+//    DirectoryNode* current = dirTree->current;
+//    char* path = (char*)malloc(MAX_DIR * 2); // µ¿Àû ¸Þ¸ð¸® ÇÒ´ç
+//    if (path == NULL) {
+//        return NULL; // ¸Þ¸ð¸® ÇÒ´ç ½ÇÆÐ ½Ã NULL ¹ÝÈ¯
+//    }
+//    strcpy(path, "/"); // ·çÆ® µð·ºÅä¸®·Î ÃÊ±âÈ­
+//
+//    char* segments[MAX_DIR]; // µð·ºÅä¸® ÀÌ¸§ ÀúÀå Æ÷ÀÎÅÍ
+//    int segmentCount = 0; // ¼¼±×¸ÕÆ® ¼ö
+//
+//    // ·çÆ® µð·ºÅä¸®¿¡ µµ´ÞÇÒ ¶§±îÁö ¹Ýº¹
+//    while (current != dirTree->root) {
+//        segments[segmentCount++] = current->name; // µð·ºÅä¸® ÀÌ¸§À» ¹è¿­¿¡ ÀúÀå
+//        current = current->Parent; // »óÀ§ µð·ºÅä¸®·Î ÀÌµ¿
+//    }
+//
+//    // °æ·Î¸¦ ¿ª¼øÀ¸·Î ¿¬°áÇÏ¿© ÃÖÁ¾ °æ·Î ±¸¼º
+//    for (int i = segmentCount - 1; i >= 0; --i) {
+//        strncat(path, segments[i], MAX_DIR * 2 - strlen(path) - 1);
+//        if (i > 0) { // ¸¶Áö¸· ¼¼±×¸ÕÆ® µÚ¿¡´Â ½½·¡½Ã¸¦ Ãß°¡ÇÏÁö ¾ÊÀ½
+//            strncat(path, "/", MAX_DIR * 2 - strlen(path) - 1);
+//        }
+//    }
+//
+//    return path;
+//}
+
+int cd(DirectoryTree* dirTree, char* cmd) {
+    DirectoryNode* tempNode = NULL;
+    char temp[MAX_DIR];
+    char* currentPath;
+    int check;
+    // ÇöÀç °æ·Î¸¦ ÀúÀåÇÏ¿© ÀÌÀü¿¡ À§Ä¡ÇÑ °æ·Î·Î »ç¿ë
+    currentPath = PrintDirectoryPath(dirTree);
+    // ÀÚ½ÅÀÇ È¨ µð·ºÅä¸®·Î ÀÌµ¿
+    if (cmd == NULL || strcmp(cmd, "~") == 0) {
+        strcpy(temp, userList->current->dir);
+        check = ChangeDirectory(dirTree, temp);
+    }
+    else if (cmd[0] == '-') //¿É¼ÇÀÌ ÀÖÀ»°æ¿ì 
+    {
+        if (strcmp(cmd, "--help") == 0)
+        {
+            printf("Usage: cd [OPTION] [DIRECTORY]\n");
+            printf("    Change the shell working directory.\n\n");
+            printf("    Change the current directory to DIR.  The default DIR is the value of the Home shell variable.\n\n");
+            printf("    Options:\n");
+            printf("       ~     Go to the home directory of the current user\n");
+            printf("       -     Switch to the previous directory\n");
+            printf("       /     Change to the root directory\n");
+            printf("       .     Remain in the current directory\n");
+            printf("       ..    Move up to the parent directory\n");
+            printf("       --help     display this help and exit\n");
+            free(currentPath);
+            return 0;
+        }
+        else if (strcmp(cmd, "-") == 0)
+        {
+            if (previousPath[0] == '\0') {
+                printf("OWD PWD NOT SET\n");
+                free(currentPath);
+                return -1;
+            }
+            printf("%s\n", previousPath);
+            check = ChangeDirectory(dirTree, previousPath);
         }
         else
+        {
+            cmd = strtok(cmd, "-");     // ±× ¿ÜÀÇ ¿É¼Çµé ¿¡·¯ Ã³¸®
+            printf("bash: cd: %s: invalid option\n", cmd);
+            printf("Try 'cd --help' for more information.\n");
+            free(currentPath);
             return -1;
+
+        }
     }
+    else //¿É¼ÇÀÌ ¾øÀ» °æ¿ì 
+    {
+        tempNode = FindDirectoryNode(dirTree, cmd, 'd');
+        if (tempNode != NULL) {
+            if (HasPermission(tempNode, 'x') != 0) {       //Á¢±Ù±ÇÇÑÀÌ °ÅºÎµÇ¾î ÀÖÀ» °æ¿ì
+                printf("cd: %s: Permission denied\n", cmd);
+                free(currentPath);
+                return -1;
+            }
+        }
+        else {
+            // µð·ºÅä¸®¸¦ Ã£Áö ¸øÇÑ °æ¿ì
+            printf("cd: %s: No such file or directory\n", cmd);
+            free(currentPath);
+            return -1;
+        }
+        check = ChangeDirectory(dirTree, cmd);
+
+    }
+
+    // ÀÌÀü °æ·Î ¾÷µ¥ÀÌÆ®
+    if (check == 0) //µð·ºÅä¸® º¯°æÀÌ ¼º°øÇÑ °æ¿ì,
+    {
+        strncpy(previousPath, currentPath, sizeof(previousPath) - 1);
+        previousPath[sizeof(previousPath) - 1] = '\0';
+    }
+    free(currentPath);
+
     return 0;
 }
 
-int MovePath(DirectoryTree* dirTree, char* dirPath)     //ê²½ë¡œ ì´ë™ í•¨ìˆ˜
-{
-    //variables
-    DirectoryNode* tmpNode = NULL;
-    char tmpPath[MAX_DIR];
-    char* command = NULL;
-    int check_exist = 0;
-
-    //set tmp
-    strncpy(tmpPath, dirPath, MAX_DIR);
-    tmpNode = dirTree->current;
-    if(strcmp(dirPath, "/") == 0){      // ìµœìƒìœ„ ë””ë ‰í† ë¦¬ì¼ ê²½ìš°
-        dirTree->current = dirTree->root;
-    }
-    else{
-        if(strncmp(dirPath, "/",1) == 0){
-            if(strtok(dirPath, "/") == NULL){
-                return -1;
-            }
-            dirTree->current = dirTree->root;
-        }
-        command = strtok(tmpPath, "/");
-        while(command != NULL){
-            check_exist = Movecurrent(dirTree, command);
-            if(check_exist != 0){   //ê²½ë¡œê°€ ì—†ì„ ê²½ìš°
-                dirTree->current = tmpNode;
-                return -1;
-            }
-            command = strtok( NULL, "/");
-        }
-    }
-    return 0;
-}

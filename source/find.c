@@ -1,163 +1,255 @@
 #include "../include/main.h"
 
+//#define MAX_THREAD 10
+//#define MAX_LENGTH 1024
+
+//directory.h   getDir >> getDirectory
+//char* getDirectory(const char* fullPath) {
+//    char* DirectoryPath = (char*)malloc(MAX_DIR);
+//    if (DirectoryPath == NULL) {
+//        return NULL;  // ¸Ş¸ğ¸® ÇÒ´ç ½ÇÆĞ ½Ã NULL ¹İÈ¯
+//    }
+//
+//    // strrchr ÇÔ¼ö¸¦ »ç¿ëÇÏ¿© °æ·Î¿¡¼­ ¸¶Áö¸· '/' Ã£±â
+//    const char* lastSlash = strrchr(fullPath, '/');
+//    if (lastSlash == NULL || lastSlash == fullPath) {
+//        free(DirectoryPath);
+//        return NULL;  // '/'°¡ ¾ø°Å³ª ¸Ç Ã³À½¿¡¸¸ ÀÖ´Â °æ¿ì
+//    }
+//
+//    // ¸¶Áö¸· '/' ÀÌÀü±îÁöÀÇ ¹®ÀÚ¿­À» º¹»ç
+//    int pathLength = lastSlash - fullPath;
+//    strncpy(DirectoryPath, fullPath, pathLength);
+//    DirectoryPath[pathLength] = '\0'; // ¹®ÀÚ¿­ Á¾·á ÁöÁ¡ ¸í½Ã
+//
+//    return DirectoryPath;
+//}
+//cd.h¿¡ ÀÖ´Âµ¥ directory.h·Î   isexitdir(ÇÔ¼ö¸í) >> FindDirectoryNode
+//DirectoryNode* FindDirectoryNode(DirectoryTree* dirTree, char* dirName, char type) {
+//    DirectoryNode* currentNode = dirTree->current->LeftChild; // ÇöÀç µğ·ºÅä¸®ÀÇ Ã¹ ¹øÂ° ÀÚ½Ä ³ëµå·Î ¼³Á¤
+//
+//    // ¸ğµç ÀÚ½Ä ³ëµå¸¦ Å½»ö
+//    while (currentNode != NULL) {
+//        // µğ·ºÅä¸® ÀÌ¸§°ú À¯ÇüÀÌ ÀÏÄ¡ÇÏ¸é ³ëµå¸¦ ¹İÈ¯
+//        if (strcmp(currentNode->name, dirName) == 0 && currentNode->type == type) {
+//            return currentNode;
+//        }
+//        // ´ÙÀ½ ÇüÁ¦ ³ëµå·Î ÀÌµ¿
+//        currentNode = currentNode->RightSibling;
+//    }
+//    // ÀÏÄ¡ÇÏ´Â ³ëµå¸¦ Ã£Áö ¸øÇÏ¸é NULL ¹İÈ¯
+//    return NULL;
+//}
+
+
+//cd.h
+//int ChangeDirectory(DirectoryTree* dirTree, char* dirPath) {
+//    // º¯¼ö ¼±¾ğ
+//    DirectoryNode* tempNode = NULL;
+//    DirectoryNode* savedNode = dirTree->current;  // ÇöÀç µğ·ºÅä¸® ³ëµå¸¦ ÀÓ½Ã º¯¼ö¿¡ ÀúÀå
+//    char tempPath[MAX_DIR];
+//    char* command = NULL;
+//
+//    // ÇöÀç µğ·ºÅä¸® ('.')ÀÏ °æ¿ì: ¾Æ¹« ÀÛ¾÷µµ ÇÏÁö ¾ÊÀ½
+//    if (strcmp(dirPath, ".") == 0) {
+//        return 0;
+//    }
+//
+//    // »óÀ§ µğ·ºÅä¸®·Î ÀÌµ¿ÇÏ´Â °æ¿ì ('..')
+//    if (strcmp(dirPath, "..") == 0) {
+//        if (dirTree->current != dirTree->root) { // ÇöÀç µğ·ºÅä¸®°¡ ·çÆ® µğ·ºÅä¸®°¡ ¾Æ´Ï¸é »óÀ§ µğ·ºÅä¸®·Î ÀÌµ¿
+//            dirTree->current = dirTree->current->Parent;
+//        }
+//        return 0;
+//    }
+//
+//    // °æ·Î¸¦ tempPath¿¡ º¹»ç
+//    strncpy(tempPath, dirPath, MAX_DIR - 1); // ¹®ÀÚ¿­ º¹»ç
+//    tempPath[MAX_DIR - 1] = '\0';
+//
+//    // ÃÖ»óÀ§ µğ·ºÅä¸®ÀÏ °æ¿ì
+//    if (strcmp(dirPath, "/") == 0) {
+//        dirTree->current = dirTree->root; // ÇöÀç µğ·ºÅä¸® = ·çÆ® µğ·ºÅä¸®
+//        return 0;
+//    }
+//
+//    // Àı´ë °æ·ÎÀÎ °æ¿ì
+//    if (dirPath[0] == '/') {
+//        dirTree->current = dirTree->root; // ÇöÀç µğ·ºÅä¸® = ·çÆ® µğ·ºÅä¸®
+//        command = strtok(tempPath + 1, "/"); // Ã¹¹øÂ° µğ·ºÅä¸® ÀÌ¸§ ÃßÃâ
+//    }
+//    else {  // »ó´ë °æ·ÎÀÎ °æ¿ì
+//        command = strtok(tempPath, "/"); // Ã¹¹øÂ° µğ·ºÅä¸® ÀÌ¸§ ÃßÃâ
+//    }
+//
+//    // °æ·Î¸¦ ÇÏ³ª¾¿ Å½»öÇÏ¸ç ÀÌµ¿
+//    while (command != NULL) {
+//        // ÇÏÀ§ µğ·ºÅä¸®·Î ÀÌµ¿ÇÏ´Â °æ¿ì
+//        tempNode = FindDirectoryNode(dirTree, command, 'd');// ÇØ´ç ÀÌ¸§ÀÇ µğ·ºÅä¸®°¡ Á¸ÀçÇÏ¸é ÀÌµ¿
+//        if (tempNode != NULL) {
+//            dirTree->current = tempNode;
+//        }
+//        else {
+//            // µğ·ºÅä¸®°¡ Á¸ÀçÇÏÁö ¾ÊÀ» °æ¿ì
+//            dirTree->current = savedNode; // ÇöÀç µğ·ºÅä¸® º¹¿ø
+//            return -1;
+//        }
+//        command = strtok(NULL, "/");
+//    }
+//
+//    return 0;
+//}
+
+
+//directory.h (º¯¼ö¸í, ¾à°£ÀÇ ¼öÁ¤) ÇÔ¼ö¸í ReadDir¿¡¼­ º¯°æ
+int ReadDirectory(DirectoryTree* dirTree, char* line, char* dirName)
+{
+    char* str; // ¹®ÀÚ¿­ Æ÷ÀÎÅÍ
+    char firstSegment[MAX_NAME]; // Ã¹¹øÂ° segment¸¦ ÀúÀåÇÒ ¹öÆÛ
+    char found = 0;
+
+
+    str = strtok(line, " "); // ¹®ÀÚ¿­À» ¶ç¾î¾²±â ´ÜÀ§·Î ºĞ¸®
+    if (str != NULL) {
+        strncpy(firstSegment, str, MAX_NAME);
+        firstSegment[MAX_NAME - 1] = '\0'; // ¾ÈÀüÇÑ Á¾·á¸¦ À§ÇØ ³Î ¹®ÀÚ Ãß°¡
+    }
+
+    for (int count = 0; count < 10; count++) {  // 10¹ø ¹İº¹
+        str = strtok(NULL, " "); // ´ÙÀ½ ¹®ÀÚ¿­ ºĞ¸®
+    }
+    //¸¶Áö¸· ¹®ÀÚ¿­¿¡ ÇØ´çÇÏ´Â ºÎºĞ¿¡ µµÂø
+    if (str != NULL) { // ¹®ÀÚ¿­ÀÌ ³²¾Æ ÀÖ´Â °æ¿ì
+        str[strlen(str) - 1] = '\0'; // ¹®ÀÚ¿­ ³¡¿¡ NULL Ãß°¡, ¹®ÀÚ¿­ Á¾·á, °³Çà¹®ÀÚÁ¦°Å 
+        char* found = strstr(str, dirName);// ´ë¼Ò¹®ÀÚ ±¸ºĞ ¾øÀÌ ¹®ÀÚ¿­ °Ë»ö, ÀÏÄ¡ÇÏ´Â ºÎºĞ ¹®ÀÚ¿­ÀÇ ½ÃÀÛÁÖ¼Ò ¹İÇÑ
+        if (found) { // dirName°ú ÀÏÄ¡ÇÏ´Â ¹®ÀÚ¿­À» Ã£Àº °æ¿ì
+            if (strcmp(str, "/") == 0) {
+                printf("/%s\n", firstSegment); // ·çÆ® µğ·ºÅä¸®ÀÎ °æ¿ì °æ·Î Ãâ·Â
+            }
+            else {
+                printf("%s/%s\n", found, firstSegment);  //·çÆ® µğ·ºÅä¸®°¡ ¾Æ´Ñ°æ¿ì, found¿Í firstSegment °áÇÕ, °æ·Î Ãâ·Â
+            }
+        }
+    }
+    return 0;
+}
+
+//directory.h (º¯¼ö¸í, ¾à°£ÀÇ ¼öÁ¤) ÇÔ¼ö¸í FindDir¿¡¼­ º¯°æ
+void FindDirectory(DirectoryTree* dirTree, char* dirName)     //Directory.txt ÆÄÀÏÀ» ¿­°í ÁöÁ¤µÈ µğ·ºÅä¸® ÀÌ¸§À» °Ë»ö
+{
+    FILE* file = fopen("Directory.txt", "r"); //directory.txt ÆÄÀÏÀ» ÀĞ±â¸ğµå·Î ¿­°í
+    if (!file) {
+        perror("No such file or directory");
+        return;
+    }
+    char line[MAX_LENGTH]; //ÆÄÀÏ¿¡¼­ ÀĞÀº °¢ ÁÙÀ» ÀúÀåÇÒ ÀÓ½Ã ¹öÆÛ 
+    while (fgets(line, sizeof(line), file)) { //ÆÄÀÏÀ» ÇÑ ÁÙ¾¿ ÀĞ°í line¿¡ ÀúÀå, ReadDirectory¸¦ È£ÃâÇÏ¿© °¢ line¿¡¼­ µğ·ºÅä¸® ÀÌ¸§À» °Ë»öÇÏ°í ÀÏÄ¡ÇÏ´Â °æ·Î Ãâ·Â
+        ReadDirectory(dirTree, line, dirName);
+    }
+    fclose(file);
+}
+
+
+// 1) ¸í·É¾î¿¡ '/'°¡ Æ÷ÇÔµÇÁö ¾ÊÀº °æ¿ì, À§Ä¡ÇÑ ÇöÀç µğ·ºÅä¸®¿¡¼­ ÆÄÀÏÀÌ³ª µğ·ºÅä¸® °Ë»ö
+// 2) ¸í·É¾î¿¡ '/'°¡ Æ÷ÇÔµÇ¾î ÀÖ´Â °æ¿ì, ÆÄÀÏÀÌ³ª µğ·ºÅä¸® °Ë»ö
+// 2-1) °æ·Î°¡ Àß¸øµÆÀ» °æ¿ì,
+// 2-2) °æ·Î°¡ ¿Ã¹Ù¸£³ª, ÆÄÀÏÀÌ³ª µğ·ºÅä¸®°¡ ¾øÀ»°æ¿ì
+void* FindThread(void* arg) {
+    ThreadTree* threadTree = (ThreadTree*)arg; // ½º·¹µå Á¤º¸¿Í ¸í·ÉÀ» Æ÷ÇÔÇÏ´Â ±¸Á¶Ã¼
+    DirectoryTree* dirTree = threadTree->threadTree; // µğ·ºÅä¸® Æ®¸® Á¢±Ù
+    char* cmd = threadTree->command; // ½ÇÇàÇÒ ¸í·É
+    char fullPath[MAX_DIR]; // ÀüÃ¼ °æ·Î¸¦ ÀúÀåÇÒ ¹öÆÛ
+    char* fileName; // ÆÄÀÏ ÀÌ¸§
+    char* dirPath; // µğ·ºÅä¸® °æ·Î
+    int dirCheck; // µğ·ºÅä¸® º¯°æ ¼º°ø ¿©ºÎ È®ÀÎ
+    DirectoryNode* currentNode = dirTree->current;
+    strncpy(fullPath, cmd, MAX_DIR); // ¸í·É¾î¿¡¼­ ÀüÃ¼ °æ·Î º¹»ç
+    fullPath[MAX_DIR - 1] = '\0'; // ³Î Á¾·á ¹®ÀÚ º¸Àå
+
+    // ÆÄÀÏ ÀÌ¸§°ú µğ·ºÅä¸® °æ·Î ºĞ¸®
+    fileName = strrchr(fullPath, '/');
+    if (fileName) {
+        fileName++; // '/' ´ÙÀ½ ¹®ÀÚ·Î ÆÄÀÏ ÀÌ¸§ ½ÃÀÛ
+        dirPath = fullPath;
+        *(fileName - 1) = '\0'; // ÆÄÀÏ ÀÌ¸§ ¾Õ¿¡¼­ ¹®ÀÚ¿­ Á¾·á·Î µğ·ºÅä¸® °æ·Î ¼³Á¤
+    }
+    else {
+        fileName = fullPath; // '/'°¡ ¾ø´Â °æ¿ì, ÀüÃ¼ ¸í·ÉÀÌ ÆÄÀÏ ÀÌ¸§
+        dirPath = ".";
+    }
+
+    // ÇÊ¿äÇÑ °æ¿ì µğ·ºÅä¸® º¯°æ
+    if (strcmp(dirPath, ".") != 0) {
+        dirCheck = ChangeDirectory(dirTree, dirPath);
+        if (dirCheck != 0) {
+            printf("find: '%s': No such file or directory.\n", dirPath);
+            dirTree->current = currentNode;
+            pthread_exit(NULL);
+        }
+    }
+
+    // ÆÄÀÏ ¶Ç´Â µğ·ºÅä¸® Á¸Àç ¿©ºÎ È®ÀÎ
+    if (!FindDirectoryNode(dirTree, fileName, 'd') && !FindDirectoryNode(dirTree, fileName, 'f')) {
+        printf("find: '%s': No such file or directory.\n", fileName);
+        dirTree->current = currentNode;
+        pthread_exit(NULL);
+    }
+
+    printf("%s\n", cmd); // °Ë»ö °á°ú Ãâ·Â
+    FindDirectory(dirTree, cmd);
+    pthread_exit(NULL);
+
+}
 int find(DirectoryTree* dirTree, char* cmd)
 {
-    char* command;
-    pthread_t threadArr[MAX_THREAD];
-    ThreadTree threadTree[MAX_THREAD];
+    char* command; //¸í·É¾î ÀúÀå Æ÷ÀÎÅÍ 
+    pthread_t ThreadArr[MAX_THREAD]; //thread ½Äº°ÀÚ ¹è¿­
+    ThreadTree ThreadTree[MAX_THREAD]; // threadº° ÀÛ¾÷ Á¤º¸ ¹è¿­ / threadtree ±¸Á¶Ã¼ ¹è¿­
 
-    int thread_cnt = 0;
-
-    if (cmd == NULL || strcmp(cmd, ".") == 0) {
-        FindDir(dirTree, dirTree->current->name);
+    int ThreadCount = 0; // »ı¼ºµÈ thread ¼ö
+    //find . and find and find -- ÀÎ °æ¿ì, ÇöÀç µğ·ºÅä¸®¿¡¼­ SearchDirÈ£Ãâ
+    if (cmd == NULL || strcmp(cmd, ".") == 0 || strcmp(cmd, "--") == 0) {
+        FindDirectory(dirTree, dirTree->current->name); //ÇöÀç µğ·ºÅä¸® °Ë»ö
         return 0;
     }
-    else if (cmd[0] == '-') {
-        if (strcmp(cmd, "--help") == 0) {
-            printf("Usage: find [-H] [-L] [-P] [-Olevel] [-D debugopts] [path...] [expression]...\n\n");
-
+    else if (cmd[0] == '-') { //¸í·É¾î°¡ ´ë½Ã(-)·Î ½ÃÀÛÇÏ¸é(¿É¼ÇÀÎ °æ¿ì)
+        if (strcmp(cmd, "--help") == 0) {//, ¸í·É¾î°¡ --helpÀÎÁö È®ÀÎÇÏ°í »ç¿ë¹ı°ú ¿É¼Ç¿¡ ´ëÇÑ µµ¿ò¸»À» Ãâ·Â
+            printf("Usage: find [OPTION] [path...] [expression]\n\n");
+            printf("    Search for files in a directory hierarchy.\n\n");
+            printf("    Options:\n");
+            printf("       .         Search for files in the current directory\n");
+            printf("       --        Search for files in the current directory\n");
+            printf("       --help    display this help and exit\n");
             printf("default path is the current directory; default expression is -print\n");
-            printf("expression may consist of: operators, options, tests, and actions:\n");
-            printf("operators (decreasing precedence; -and is implicit where no others are given):\n");
-            printf("      ( EXPR )   ! EXPR   -not EXPR   EXPR1 -a EXPR2   EXPR1 -and EXPR2)\n");
-            printf("      EXPR1 -o EXPR2   EXPR1 -or EXPR2   EXPR1 , EXPR2\n");
-            printf("positinal options (always true): -daystart -follow -regextype\n\n");
 
-            printf("normal options (always true, specified before other expressions):\n");
-            printf("      -depth --help -maxdepth LEVELS -mindepth LEVELS -mount -noleaf\n");
-            printf("      --version -xdev -ignore_readdir_race -noignore_readdir_race\n");
-            printf("tests (N can be +N or -N or N): -amin N -anewer FILE -atime N -cmin N\n");
-            printf("      -cnewer FILE -ctime N -empty -flase -fstype TYPE -gid N -group NAME\n");
-            printf("      -ilname PATTERN -iname PATTERN -inum N -iwholename PATTERN -iregex PATTERN\n");
-            printf("      -links N -lname PATTERN -mmin N -mtime N -name PATTERN -newer FILE\n");
-            printf("      -nouser -nogroup -path PATTERN -perm [-/]MODE -regex PATTERN\n");
-            printf("      -readbale -writable -executable\n");
-            printf("      -wholename PATTERN -size N[bcwkMG] -true -type [bcdpflsD] -uid N\n");
-            printf("      -used N -user NAME -xtype [bcdpfls]      -context CONTEXT\n\n");
-
-            printf("actions: -delete -print0 -printf FORMAT -fprintf FILE FORMAT -print\n");
-            printf("      -fprint0 FILE -fprint FILE -ls -fls FILE -prune -quit\n");
-            printf("      -exec COMMAND ; -exec COMMAND {} + -ok COMMAND ;\n");
-            printf("      -execdir COMMAND ; -exerdir COMMAND {} + -okdir COMMAND ;\n\n");
-
-            printf("Valid arguments for -D:\n");
-            printf("exec, opt, rates, search, stat, time, tree, all, help\n");
-            printf("Use '-D help' for a description of the options, or see find(1)\n\n");
-
-            printf("Please see also the documentation at https://www.gnu.org/software/findutils/.\n");
-            printf("You can report (and track progress on fixing) bugs in the \"find\"\n");
-            printf("program via the GNU findutils bug-reporting page at\n");
-            printf("https://savannah.gnu.org/bugs/?group=findutils or, if\n");
-            printf("you have no web access, by sending email to <bug-findutils@gnu.org>.\n");
             return -1;
         }
-        else {
-            cmd = strtok(cmd, "-");
-            printf("find: invalid option -- '%s'\n", cmd);
-            printf("Try 'find --help' for more information.\n");
+        else {  //À¯È¿ÇÏÁö ¾ÊÀº ¿É¼ÇÀÎ °æ¿ì ¿À·ù¸Ş¼¼Áö¿Í µµ¿ò¸» Ãâ·Â
+            char* invalid_option = strchr(cmd, '-');
+            printf("find: unknown predicate '%s'\n", invalid_option);  // ¿À·ù ¸Ş½ÃÁö
+            printf("Try 'find --help' for more information.\n");  // µµ¿ò¸» ¾È³»
             return -1;
         }
     }
-    else
+    else //threadTree ¹è¿­À» ¹İº¹ÇÏ¸ç, °¢ ¸í·É¾î¿¡ ´ëÇØ »õ·Î¿î ½º·¹µå¸¦ »ı¼ºÇÏ°í(pthread_create), °¢ ½º·¹µå°¡ ¿Ï·áµÉ ¶§±îÁö ±â´Ù¸²(pthread_join).
     {
-        command = strtok(NULL, " ");
-        threadTree[thread_cnt].threadTree = dirTree;
-        threadTree[thread_cnt++].cmd = cmd;
+        command = strtok(cmd, " "); //cmd¿¡¼­ Ã¹ ¹øÂ° ¸í·É¾î ºĞ¸®
+        ThreadTree[ThreadCount].threadTree = dirTree; // ÇöÀç µğ·ºÅä¸® Æ®¸® ¼³Á¤
+        ThreadTree[ThreadCount++].command = cmd; //Ã¹ ¹øÂ° ¸í·É¾î ¼³Á¤
     }
-    while (command != NULL) {   //ë©€í‹°ìŠ¤ë ˆë“œ ì‘ì—…ì„ ìœ„í•´ íŒŒì¼ì´ë¦„ë§ˆë‹¤ ìŠ¤ë ˆë“œë°°ì—´ì•ˆì— ì •ë³´ë¥¼ ì €ì¥
-        threadTree[thread_cnt].threadTree = dirTree;
-        threadTree[thread_cnt++].cmd = command;
-        command = strtok(NULL, " ");
+    while (command != NULL) {   // ¸í·É¾î°¡ ³²¾ÆÀÖ´Â µ¿¾È ¹İº¹ ( //¸ÖÆ¼½º·¹µå ÀÛ¾÷À» À§ÇØ ÆÄÀÏÀÌ¸§¸¶´Ù ½º·¹µå¹è¿­¾È¿¡ Á¤º¸¸¦ ÀúÀå)
+        ThreadTree[ThreadCount].threadTree = dirTree; // ÇöÀç µğ·ºÅä¸® Æ®¸® ¼³Á¤
+        ThreadTree[ThreadCount++].command = command; // ¸í·É¾î ¼³Á¤
+        command = strtok(NULL, " "); // ´ÙÀ½ ¸í·É¾î ºĞ¸®
     }
-    for (int i = 0; i < thread_cnt; i++) {      //pthreadìƒì„± í›„ cat_threadë¡œ ì²˜ë¦¬, ë§ˆì§€ë§‰ìœ¼ë¡œ join
-        pthread_create(&threadArr[i], NULL, find_thread, (void*)&threadTree[i]);
-        pthread_join(threadArr[i], NULL);
+    for (int i = 0; i < ThreadCount; i++) { // ¸ğµç ½º·¹µå¸¦ »ı¼º
+        pthread_create(&ThreadArr[i], NULL, FindThread, (void*)&ThreadTree[i]);
     }
+    for (int i = 0; i < ThreadCount; i++) { // ¸ğµç ½º·¹µå°¡ Á¾·áµÉ ¶§±îÁö ±â´Ù¸²
+        pthread_join(ThreadArr[i], NULL);
+    }
+
     return 0;
-}
 
-void* find_thread(void* arg) {     //íŒŒì¼ë§ˆë‹¤ ìŠ¤ë ˆë“œë¡œ ì‹¤í–‰ë˜ëŠ” í•¨ìˆ˜
-    ThreadTree* threadTree = (ThreadTree*)arg;
-    DirectoryNode* currentNode = NULL;
-    DirectoryNode* tmpNode = NULL;
-    DirectoryNode* tmpNode2 = NULL;
-    DirectoryTree* dirTree = threadTree->threadTree;
-    char* command;
-    char tmp[MAX_DIR];
-    char tmp2[MAX_DIR];
-    char tmp3[MAX_DIR];
-    char tmp4[MAX_DIR];
-    char* cmd = threadTree->cmd;
-    int check_directory;
 
-    strncpy(tmp, cmd, MAX_DIR);
-    currentNode = dirTree->current;
-    if (strstr(tmp, "/") == NULL) {     //ìœ„ì¹˜í•œ ë””ë ‰í† ë¦¬ ì•ˆì— ìˆëŠ” íŒŒì¼ì¼ ê²½ìš°
-        tmpNode = IsExistDir(dirTree, cmd, 'd');
-        tmpNode2 = IsExistDir(dirTree, cmd, 'f');
-        if (tmpNode == NULL && tmpNode2 == NULL) {
-            printf("find: '%s': No such file or direcory.\n", cmd);
-            return NULL;
-        }
-    }
-    else {      //ê·¸ ì™¸ì— ë‹¤ë¥¸ ë””ë ‰í† ë¦¬ ì•ˆì— ìˆëŠ” íŒŒì¼ ë¶ˆëŸ¬ì˜¬ ê²½ìš°
-        strncpy(tmp2, getDir(tmp), MAX_DIR);
-        strncpy(tmp4, cmd, MAX_DIR);
-        check_directory = MovePath(dirTree, tmp2);
-        if (check_directory) {      //íŒŒì¼ì„ ê°€ì§€ëŠ” ë””ë ‰í† ë¦¬ê°€ ì¡´ì¬í•˜ì§€ ì•Šì„ ê²½ìš°
-            printf("find: '%s': No such file or directory.\n", tmp2);
-            dirTree->current = currentNode;
-            return NULL;
-        }
-        command = strtok(tmp4, "/");
-        while (command != NULL) {
-            strncpy(tmp3, command, MAX_NAME);
-            command = strtok(NULL, "/");
-        }
-        tmpNode = IsExistDir(dirTree, tmp3, 'd');
-        tmpNode2 = IsExistDir(dirTree, tmp3, 'f');
-        if (tmpNode == NULL && tmpNode2 == NULL) {       //íŒŒì¼ì´ ì¡´ì¬í•˜ì§€ ì•Šì„ ê²½ìš°
-            printf("find: '%s': No such file or directory.\n", tmp3);
-            dirTree->current = currentNode;
-            return NULL;
-        }
-        dirTree->current = currentNode;
-    }
-    printf("%s\n", cmd);    //ìê¸°ìì‹  ì¶œë ¥í•´ì£¼ê¸°
-    FindDir(dirTree, cmd);
-    pthread_exit(NULL);
-}
-
-int ReadDir(DirectoryTree* dirTree, char* tmp, char* dirName)       //ì°¾ì€ ê²½ë¡œ ì¶œë ¥í•˜ê¸°
-{
-    char* str;
-    char str2[MAX_NAME];
-    str = strtok(tmp, " ");
-    strcpy(str2, str);
-    for (int i = 0; i < 10; i++) {
-        str = strtok(NULL, " ");
-    }
-    if (str != NULL) {
-        str[strlen(str)-1] = '\0';
-        char* str3 = strcasestr(str, dirName);
-        if (str3 != NULL) {
-            if (strcmp(str, "/") == 0){
-                printf("/%s\n", str2);
-            }
-            else{
-                printf("%s/%s\n", str3, str2);
-            }
-        }
-    }
-    return 0;
-}
-
-void FindDir(DirectoryTree* dirTree, char* dirName)     //findí•œ ë””ë ‰í† ë¦¬ directory.txtì—ì„œ ì°¾ê¸°
-{
-    char tmp[MAX_LENGTH];
-    Directory = fopen("Directory.txt", "r");
-    while (fgets(tmp, MAX_LENGTH, Directory) != NULL) {
-        ReadDir(dirTree, tmp, dirName);
-    }
-    fclose(Directory);
 }

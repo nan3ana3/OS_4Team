@@ -4,12 +4,12 @@ int main()
 {
     char cmd[100];
     Linux = LoadDir();
-    usrList = LoadUserList();
+    userList = LoadUserList();
     dStack = InitializeStack();
 
-    Login(usrList, Linux);
+    Login(userList, Linux);
     Start();
-    SaveUserList(usrList);
+    SaveUserList(userList);
 
     while(1){
         PrintHead(Linux, dStack);

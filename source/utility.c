@@ -36,7 +36,7 @@ void WriteNode(DirectoryTree* dirTree, DirectoryNode* dirNode, Stack* dirStack)
 {
     // 노드 정보 기록: 디렉토리 노드의 이름, 타입, 모드, 크기, UID, GID, 날짜 및 시간을 파일에 기록
     fprintf(Directory, "%s %c %d ", dirNode->name, dirNode->type, dirNode->mode);
-    fprintf(Directory, "%d %d %d %d %d %d %d", dirNode->SIZE, dirNode->UID, dirNode->GID, dirNode->month, dirNode->day, dirNode->hour, dirNode->minute);
+    fprintf(Directory, "%d %d %d %d %d %d %d", dirNode->SIZE, dirNode->UserID, dirNode->GroupID, dirNode->month, dirNode->day, dirNode->hour, dirNode->minute);
 
     if(dirNode == dirTree->root)
         fprintf(Directory, "\n");
@@ -79,9 +79,9 @@ int ReadNode(DirectoryTree* dirTree, char* tmp)
     command = strtok(NULL, " ");
     NewNode->SIZE = atoi(command);
     command = strtok(NULL, " ");
-    NewNode->UID = atoi(command);
+    NewNode->UserID = atoi(command);
     command = strtok(NULL, " ");
-    NewNode->GID = atoi(command);
+    NewNode->GroupID = atoi(command);
     command = strtok(NULL, " ");
     NewNode->month = atoi(command);
     command = strtok(NULL, " ");
@@ -205,40 +205,40 @@ void Instruction(DirectoryTree* dirTree, char* cmd)
         return;
     }
     command = strtok(cmd, " "); // 명령어 추출
-    if(strcasecmp(command, "cat") == 0){ // cat 명령어 처리
-        command = strtok(NULL, " ");
-        check_correct = cat(dirTree, command);
-        if(check_correct == 0){
-            SaveDir(dirTree, dStack);
-        }
-    }
-    else if(strcasecmp(command, "cd") == 0){ // cd 명령어 처리
-        command = strtok(NULL, " ");
-        cd(dirTree, command);
-    }
-    else if(strcasecmp(command, "chmod") == 0){ // chmod 명령어 처리
-        command = strtok(NULL, " ");
-        check_correct = chmod(dirTree, command);
-        if(check_correct == 0){
-            SaveDir(dirTree, dStack);
-        }
-    }
-    else if(strcasecmp(command, "chown") == 0){ // chown 명령어 처리
-        command = strtok(NULL, " ");
-        check_correct = ft_chown(dirTree, command);
-        if(check_correct == 0){
-            SaveDir(dirTree, dStack);
-        }
-    }
-    else if(strcasecmp(command, "find") == 0){ // find 명령어 처리
-        command = strtok(NULL, " ");
-        find(dirTree, command);
-    }
-    else if(strcasecmp(command, "grep") == 0){ // grep 명령어 처리
-        command = strtok(NULL, " ");
-        grep(dirTree, command);
-    }
-    else if(strcasecmp(command, "ls") == 0){ // ls 명령어 처리
+    // if(strcasecmp(command, "cat") == 0){ // cat 명령어 처리
+    //     command = strtok(NULL, " ");
+    //     check_correct = cat(dirTree, command);
+    //     if(check_correct == 0){
+    //         SaveDir(dirTree, dStack);
+    //     }
+    // }
+    // else if(strcasecmp(command, "cd") == 0){ // cd 명령어 처리
+    //     command = strtok(NULL, " ");
+    //     cd(dirTree, command);
+    // }
+    // else if(strcasecmp(command, "chmod") == 0){ // chmod 명령어 처리
+    //     command = strtok(NULL, " ");
+    //     check_correct = chmod(dirTree, command);
+    //     if(check_correct == 0){
+    //         SaveDir(dirTree, dStack);
+    //     }
+    // }
+    // else if(strcasecmp(command, "chown") == 0){ // chown 명령어 처리
+    //     command = strtok(NULL, " ");
+    //     check_correct = ft_chown(dirTree, command);
+    //     if(check_correct == 0){
+    //         SaveDir(dirTree, dStack);
+    //     }
+    // }
+    // else if(strcasecmp(command, "find") == 0){ // find 명령어 처리
+    //     command = strtok(NULL, " ");
+    //     find(dirTree, command);
+    // }
+    // else if(strcasecmp(command, "grep") == 0){ // grep 명령어 처리
+    //     command = strtok(NULL, " ");
+    //     grep(dirTree, command);
+    // }
+    if(strcasecmp(command, "ls") == 0){ // ls 명령어 처리
         command = strtok(NULL, " ");
         ls(dirTree, command);
     }
@@ -249,17 +249,17 @@ void Instruction(DirectoryTree* dirTree, char* cmd)
             SaveDir(dirTree, dStack);
         }
     }
-    else if(strcasecmp(command, "pwd") == 0){ // pwd 명령어 처리
-        command = strtok(NULL, " ");
-        pwd(dirTree, dStack, command);
-    }
-    else if(strcasecmp(command, "rm") == 0){ // rm 명령어 처리
-        command = strtok(NULL, " ");
-        check_correct = rm(dirTree, command);
-        if(check_correct == 0){
-            SaveDir(dirTree, dStack);
-        }
-    }
+    // else if(strcasecmp(command, "pwd") == 0){ // pwd 명령어 처리
+    //     command = strtok(NULL, " ");
+    //     pwd(dirTree, dStack, command);
+    // }
+    // else if(strcasecmp(command, "rm") == 0){ // rm 명령어 처리
+    //     command = strtok(NULL, " ");
+    //     check_correct = rm(dirTree, command);
+    //     if(check_correct == 0){
+    //         SaveDir(dirTree, dStack);
+    //     }
+    // }
     else if(strcasecmp(cmd, "exit") == 0){ // exit 명령어 처리
             printf("Logout\n");
             exit(0);
@@ -274,9 +274,9 @@ void Instruction(DirectoryTree* dirTree, char* cmd)
 void Start()
 {
     printf("Last login: ");
-    GetWeek(usrList->current->wday); // 마지막 로그인 요일 출력
-    GetMonth(usrList->current->month); // 마지막 로그인 월 출력
-    printf("%d %02d:%02d:%02d %d\n", usrList->current->day, usrList->current->hour, usrList->current->minute, usrList->current->sec, usrList->current->year); // 마지막 로그인 날짜와 시간 출력
+    GetWeek(userList->current->wday); // 마지막 로그인 요일 출력
+    GetMonth(userList->current->month); // 마지막 로그인 월 출력
+    printf("%d %02d:%02d:%02d %d\n", userList->current->day, userList->current->hour, userList->current->minute, userList->current->sec, userList->current->year); // 마지막 로그인 날짜와 시간 출력
 }
 
 // 현재 사용자의 promptheader를 출력함
@@ -288,13 +288,13 @@ void PrintHead(DirectoryTree* dirTree, Stack* dirStack)
     char tmp2[MAX_DIR] = "";
     char user;
 
-    if(usrList->current == usrList->head)
+    if(userList->current == userList->head)
         user = '#'; // 루트 사용자일 경우
     else
         user = '$'; // 일반 사용자일 경우
 
     BOLD;GREEN; // 글자 색상 설정
-    printf("%s@2-os-linux", usrList->current->name); // 사용자 이름 출력
+    printf("%s@2-os-linux", userList->current->name); // 사용자 이름 출력
     DEFAULT; // 글자 색상 초기화
     printf(":");
     tmpNode = dirTree->current;
@@ -313,13 +313,13 @@ void PrintHead(DirectoryTree* dirTree, Stack* dirStack)
         }
     }
 
-    strncpy(tmp2, tmp, strlen(usrList->current->dir)); // 현재 경로 복사
+    strncpy(tmp2, tmp, strlen(userList->current->dir)); // 현재 경로 복사
 
-    if(usrList->current == usrList->head){
+    if(userList->current == userList->head){
         BOLD;BLUE;
         printf("%s", tmp); // 루트 사용자인 경우 경로 출력
     }
-    else if(strcmp(usrList->current->dir, tmp2) != 0){
+    else if(strcmp(userList->current->dir, tmp2) != 0){
         BOLD;BLUE;
         printf("%s", tmp); // 현재 경로와 사용자 디렉토리가 다른 경우 경로 출력
     }

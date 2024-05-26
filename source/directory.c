@@ -1,53 +1,102 @@
 #include "../include/main.h"
 
-// ì¬ê·€ì ìœ¼ë¡œ ë””ë ‰í† ë¦¬ ë…¸ë“œë¥¼ ì‚­ì œ
-void DestroyDir(DirectoryNode* dirNode) 
-{
-    if(dirNode->RightSibling != NULL){
-        DestroyDir(dirNode->RightSibling);
+
+void DestroyDir(DirectoryNode* dirNode) {
+    if (dirNode == NULL) return;
+
+    DirectoryNode* current = dirNode->LeftChild;
+    while (current != NULL) {
+        DirectoryNode* next = current->RightSibling;
+        DestroyDir(current);
+        current = next;
     }
-    if(dirNode->LeftChild != NULL){
-        DestroyDir(dirNode->LeftChild);
-    }
-    dirNode->LeftChild = NULL;
-    dirNode->RightSibling = NULL;
-    DestroyNode(dirNode); //ìœ í‹¸ë¦¬í‹°ì— ìˆìŒ, í˜„ì¬ ë…¸ë“œë¥¼ ì‚­ì œí•¨
+
+    DestroyNode(dirNode);
 }
 
-// ì£¼ì–´ì§„ ì´ë¦„ê³¼ íƒ€ì…ì˜ ë””ë ‰í† ë¦¬ ë…¸ë“œê°€ í˜„ì¬ ë””ë ‰í† ë¦¬ì˜ ìì‹ ë…¸ë“œë“¤ ì¤‘ì— ì¡´ì¬í•˜ëŠ” ì§€ í™•ì¸
-DirectoryNode* IsExistDir(DirectoryTree* dirTree, char* dirName, char type)
-{
-    DirectoryNode* returnNode = NULL;
+//void DestroyDir(DirectoryNode* dirNode)
+//{
+//    if(dirNode->RightSibling != NULL){
+//        DestroyDir(dirNode->RightSibling);
+//    }
+//    if(dirNode->LeftChild != NULL){
+//        DestroyDir(dirNode->LeftChild);
+//    }
+//    dirNode->LeftChild = NULL;
+//    dirNode->RightSibling = NULL;
+//    DestroyNode(dirNode);
+//}
 
-    returnNode = dirTree->current->LeftChild;
-    while(returnNode != NULL){
-        if(strcasecmp(returnNode->name, dirName) == 0 && returnNode->type == type)
-            break;
-        returnNode = returnNode->RightSibling;
+
+DirectoryNode* FindDirectoryNode(DirectoryTree* dirTree, char* dirName, char type) {
+    DirectoryNode* currentNode = dirTree->current->LeftChild; // ÇöÀç µğ·ºÅä¸®ÀÇ Ã¹ ¹øÂ° ÀÚ½Ä ³ëµå·Î ¼³Á¤
+
+    // ¸ğµç ÀÚ½Ä ³ëµå¸¦ Å½»ö
+    while (currentNode != NULL) {
+        // µğ·ºÅä¸® ÀÌ¸§°ú À¯ÇüÀÌ ÀÏÄ¡ÇÏ¸é ³ëµå¸¦ ¹İÈ¯
+        if (strcmp(currentNode->name, dirName) == 0 && currentNode->type == type) {
+            return currentNode;
+        }
+        // ´ÙÀ½ ÇüÁ¦ ³ëµå·Î ÀÌµ¿
+        currentNode = currentNode->RightSibling;
     }
-    return returnNode;
+    // ÀÏÄ¡ÇÏ´Â ³ëµå¸¦ Ã£Áö ¸øÇÏ¸é NULL ¹İÈ¯
+    return NULL;
 }
 
-// ê²½ë¡œ ë¬¸ìì—´ì—ì„œ ë””ë ‰í† ë¦¬ ì´ë¦„ì„ ì¶”ì¶œ, ê²½ë¡œ ë°˜í™˜
-char* getDir(char* dirPath)
-{
-    char* tmpPath = (char*)malloc(MAX_DIR);
-    char* directory = NULL;
-    char tmp[MAX_DIR];
-    char tmp2[MAX_DIR];
+//DirectoryNode* IsExistDir(DirectoryTree* dirTree, char* dirName, char type)
+//{
+//    DirectoryNode* returnNode = NULL;
+//
+//    returnNode = dirTree->current->LeftChild;
+//    while(returnNode != NULL){
+//        if(strcasecmp(returnNode->name, dirName) == 0 && returnNode->type == type)
+//            break;
+//        returnNode = returnNode->RightSibling;
+//    }
+//    return returnNode;
+//}
 
-    strncpy(tmp, dirPath, MAX_DIR);
-    directory = strtok(dirPath, "/");
-    while(directory != NULL){
-        strncpy(tmp2, directory, MAX_DIR);
-        directory  = strtok(NULL, "/");
+
+char* getDirectory(const char* fullPath) {
+    char* DirectoryPath = (char*)malloc(MAX_DIR);
+    if (DirectoryPath == NULL) {
+        return NULL;  // ¸Ş¸ğ¸® ÇÒ´ç ½ÇÆĞ ½Ã NULL ¹İÈ¯
     }
-    strncpy(tmpPath, tmp, strlen(tmp)-strlen(tmp2)-1);
-    tmpPath[strlen(tmp)-strlen(tmp2)-1] = '\0';
-    return tmpPath;
+
+    // strrchr ÇÔ¼ö¸¦ »ç¿ëÇÏ¿© °æ·Î¿¡¼­ ¸¶Áö¸· '/' Ã£±â
+    const char* lastSlash = strrchr(fullPath, '/');
+    if (lastSlash == NULL || lastSlash == fullPath) {
+        free(DirectoryPath);
+        return NULL;  // '/'°¡ ¾ø°Å³ª ¸Ç Ã³À½¿¡¸¸ ÀÖ´Â °æ¿ì
+    }
+
+    // ¸¶Áö¸· '/' ÀÌÀü±îÁöÀÇ ¹®ÀÚ¿­À» º¹»ç
+    int pathLength = lastSlash - fullPath;
+    strncpy(DirectoryPath, fullPath, pathLength);
+    DirectoryPath[pathLength] = '\0'; // ¹®ÀÚ¿­ Á¾·á ÁöÁ¡ ¸í½Ã
+
+    return DirectoryPath;
 }
 
-// ë””ë ‰í† ë¦¬ íŠ¸ë¦¬ë¥¼ íŒŒì¼ì— ì €ì¥
+//char* getDir(char* dirPath)
+//{
+//    char* tmpPath = (char*)malloc(MAX_DIR);
+//    char* directory = NULL;
+//    char tmp[MAX_DIR];
+//    char tmp2[MAX_DIR];
+//
+//    strncpy(tmp, dirPath, MAX_DIR);
+//    directory = strtok(dirPath, "/");
+//    while(directory != NULL){
+//        strncpy(tmp2, directory, MAX_DIR);
+//        directory  = strtok(NULL, "/");
+//    }
+//    strncpy(tmpPath, tmp, strlen(tmp)-strlen(tmp2)-1);
+//    tmpPath[strlen(tmp)-strlen(tmp2)-1] = '\0';
+//    return tmpPath;
+//}
+
 void SaveDir(DirectoryTree* dirTree, Stack* dirStack)
 {
 
@@ -56,7 +105,6 @@ void SaveDir(DirectoryTree* dirTree, Stack* dirStack)
     fclose(Directory);
 }
 
-// íŒŒì¼ì—ì„œ ë””ë ‰í† ë¦¬ íŠ¸ë¦¬ë¥¼ ë¡œë“œí•¨
 DirectoryTree* LoadDir()
 {
     DirectoryTree* dirTree = (DirectoryTree*)malloc(sizeof(DirectoryTree));

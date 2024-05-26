@@ -14,8 +14,8 @@ UserList* InitializeUser()
     // 루트 사용자 정보 설정
     strncpy(tmpNode->name, "root", MAX_NAME);
     strncpy(tmpNode->dir, "/", MAX_NAME);
-    tmpNode->UID = 0;
-    tmpNode->GID = 0;
+    tmpNode->UserID = 0;
+    tmpNode->GroupID = 0;
     tmpNode->year = today->tm_year + 1900;
     tmpNode->month = today->tm_mon + 1;
     tmpNode->wday = today->tm_wday;
@@ -23,7 +23,7 @@ UserList* InitializeUser()
     tmpNode->hour = today->tm_hour;
     tmpNode->minute = today->tm_min;
     tmpNode->sec = today->tm_sec;
-    tmpNode->LinkNode = NULL;
+    tmpNode->link= NULL;
 
     // 사용자 리스트 초기화
     returnList->head = tmpNode;
@@ -53,13 +53,13 @@ void WriteUser(UserList* userList, UserNode* userNode)
 
     // 사용자 정보 파일에 기록
     fprintf(User, "%s %d %d %d %d %d %d %d %d %d %s\n",
-        userNode->name, userNode->UID, userNode->GID, userNode->year,
+        userNode->name, userNode->UserID, userNode->GroupID, userNode->year,
         userNode->month, userNode->wday, userNode->day, userNode->hour,
         userNode->minute, userNode->sec, userNode->dir);
 
     // 연결된 다음 사용자 노드도 기록
-    if (userNode->LinkNode != NULL) {
-        WriteUser(userList, userNode->LinkNode);
+    if (userNode->link != NULL) {
+        WriteUser(userList, userNode->link);
     }
 }
 
@@ -83,15 +83,15 @@ int ReadUser(UserList* userList, char* tmp)
     UserNode* tmpNode = (UserNode*)malloc(sizeof(UserNode));
     char* user_infor;
 
-    tmpNode->LinkNode = NULL;
+    tmpNode->link = NULL;
 
     // 문자열에서 사용자 정보 추출
     user_infor = strtok(tmp, " ");
     strncpy(tmpNode->name, user_infor, MAX_NAME);
     user_infor = strtok(NULL, " ");
-    tmpNode->UID = atoi(user_infor);
+    tmpNode->UserID = atoi(user_infor);
     user_infor = strtok(NULL, " ");
-    tmpNode->GID = atoi(user_infor);
+    tmpNode->GroupID = atoi(user_infor);
     user_infor = strtok(NULL, " ");
     tmpNode->year = atoi(user_infor);
     user_infor = strtok(NULL, " ");
@@ -115,7 +115,7 @@ int ReadUser(UserList* userList, char* tmp)
         userList->head = tmpNode;
         userList->tail = tmpNode;
     } else {
-        userList->tail->LinkNode = tmpNode;
+        userList->tail->link = tmpNode;
         userList->tail = tmpNode;
     }
     return 0;
@@ -155,7 +155,7 @@ UserNode* IsExistUser(UserList* userList, char* userName)
     while (returnUser != NULL) {
         if (strcasecmp(returnUser->name, userName) == 0)
             break;
-        returnUser = returnUser->LinkNode;
+        returnUser = returnUser->link;
     }
 
     return returnUser;
@@ -166,11 +166,11 @@ char* GetUID(DirectoryNode* dirNode)
 {
     UserNode* tmpNode = NULL;
 
-    tmpNode = usrList->head;
+    tmpNode = userList->head;
     while (tmpNode != NULL) {
-        if (tmpNode->UID == dirNode->UID)
+        if (tmpNode->UserID == dirNode->UserID)
             break;
-        tmpNode = tmpNode->LinkNode;
+        tmpNode = tmpNode->link;
     }
     return tmpNode->name;
 }
@@ -180,11 +180,11 @@ char* GetGID(DirectoryNode* dirNode)
 {
     UserNode* tmpNode = NULL;
 
-    tmpNode = usrList->head;
+    tmpNode = userList->head;
     while (tmpNode != NULL) {
-        if (tmpNode->GID == dirNode->GID)
+        if (tmpNode->GroupID == dirNode->GroupID)
             break;
-        tmpNode = tmpNode->LinkNode;
+        tmpNode = tmpNode->link;
     }
     return tmpNode->name;
 }
@@ -202,7 +202,7 @@ void Login(UserList* userList, DirectoryTree* dirTree)
     printf("Users: ");
     while (tmpNode != NULL) {
         printf("%s ", tmpNode->name);
-        tmpNode = tmpNode->LinkNode;
+        tmpNode = tmpNode->link;
     }
     printf("\n");
 

@@ -1,77 +1,114 @@
 #include "../include/main.h"
 
-// 사용자의 권한을 확인하는 함수
+// 박진성
+int CheckPermission(const int* permissions, char pms, int index) {
+    switch (pms) {
+    case 'r': return permissions[index] ? 0 : -1; // 읽기 권한 확인
+    case 'w': return permissions[index + 1] ? 0 : -1; // 쓰기 권한 확인
+    case 'x': return permissions[index + 2] ? 0 : -1; // 실행 권한 확인
+    default: return -1; // 잘못된 권한 요청
+    }
+}
+
 int HasPermission(DirectoryNode* dirNode, char pms)
 {
-    // 슈퍼유저(UID가 0)는 항상 모든 권한을 가집니다.
-    if(usrList->current->UID == 0)
-        return 0;
+    // userList나 current 사용자가 NULL인지 확인
+    if (userList == NULL || userList->current == NULL) {
+        return -1; // 적절한 에러 코드 반환
+    }
 
-    // 사용자가 파일 소유자일 경우
-    if(usrList->current->UID == dirNode->UID){
-        if(pms == 'r'){ // 읽기 권한 확인
-            if(dirNode->permission[0] == 0)
-                return -1; // 읽기 권한 없음
-            else
-                return 0; // 읽기 권한 있음
-        }
-        if(pms == 'w'){ // 쓰기 권한 확인
-            if(dirNode->permission[1] == 0)
-                return -1; // 쓰기 권한 없음
-            else
-                return 0; // 쓰기 권한 있음
-        }
-        if(pms == 'x'){ // 실행 권한 확인
-            if(dirNode->permission[2] == 0)
-                return -1; // 실행 권한 없음
-            else
-                return 0; // 실행 권한 있음
-        }
+    // 관리자 (루트 사용자)는 모든 권한을 가짐
+    if (userList->current->UserID == 0) {
+        return 0;
     }
-    // 사용자가 같은 그룹에 속해 있을 경우
-    else if(usrList->current->GID == dirNode->GID){
-        if(pms == 'r'){ // 읽기 권한 확인
-            if(dirNode->permission[3] == 0)
-                return -1; // 읽기 권한 없음
-            else
-                return 0; // 읽기 권한 있음
-        }
-        if(pms == 'w'){ // 쓰기 권한 확인
-            if(dirNode->permission[4] == 0)
-                return -1; // 쓰기 권한 없음
-            else
-                return 0; // 쓰기 권한 있음
-        }
-        if(pms == 'x'){ // 실행 권한 확인
-            if(dirNode->permission[5] == 0)
-                return -1; // 실행 권한 없음
-            else
-                return 0; // 실행 권한 있음
-        }
+    // 소유자의 권한을 확인
+    if (userList->current->UserID == dirNode->UserID) {
+        return CheckPermission(dirNode->permission, pms, 0);
     }
-    // 그 외의 경우(다른 사용자)
-    else{
-        if(pms == 'r'){ // 읽기 권한 확인
-            if(dirNode->permission[6] == 0)
-                return -1; // 읽기 권한 없음
-            else
-                return 0; // 읽기 권한 있음
-        }
-        if(pms == 'w'){ // 쓰기 권한 확인
-            if(dirNode->permission[7] == 0)
-                return -1; // 쓰기 권한 없음
-            else
-                return 0; // 쓰기 권한 있음
-        }
-        if(pms == 'x'){ // 실행 권한 확인
-            if(dirNode->permission[8] == 0)
-                return -1; // 실행 권한 없음
-            else
-                return 0; // 실행 권한 있음
-        }
+
+    // 그룹의 권한을 확인
+    if (userList->current->GroupID == dirNode->GroupID) {
+        return CheckPermission(dirNode->permission, pms, 3);
     }
-    return -1; // 유효하지 않은 권한 요청
+
+    // 기타 사용자의 권한을 확인
+    return CheckPermission(dirNode->permission, pms, 6);
 }
+
+// 사용자의 권한을 확인하는 함수
+//int HasPermission(DirectoryNode* dirNode, char pms)
+//{
+//    // 슈퍼유저(UID가 0)는 항상 모든 권한을 가집니다.
+//    if(usrList->current->UserID == 0)
+//        return 0;
+//
+//    // 사용자가 파일 소유자일 경우
+//    if(usrList->current->UserID == dirNode->UserID){
+//        if(pms == 'r'){ // 읽기 권한 확인
+//            if(dirNode->permission[0] == 0)
+//                return -1; // 읽기 권한 없음
+//            else
+//                return 0; // 읽기 권한 있음
+//        }
+//        if(pms == 'w'){ // 쓰기 권한 확인
+//            if(dirNode->permission[1] == 0)
+//                return -1; // 쓰기 권한 없음
+//            else
+//                return 0; // 쓰기 권한 있음
+//        }
+//        if(pms == 'x'){ // 실행 권한 확인
+//            if(dirNode->permission[2] == 0)
+//                return -1; // 실행 권한 없음
+//            else
+//                return 0; // 실행 권한 있음
+//        }
+//    }
+//    // 사용자가 같은 그룹에 속해 있을 경우
+//    else if(usrList->current->GroupID == dirNode->GroupID){
+//        if(pms == 'r'){ // 읽기 권한 확인
+//            if(dirNode->permission[3] == 0)
+//                return -1; // 읽기 권한 없음
+//            else
+//                return 0; // 읽기 권한 있음
+//        }
+//        if(pms == 'w'){ // 쓰기 권한 확인
+//            if(dirNode->permission[4] == 0)
+//                return -1; // 쓰기 권한 없음
+//            else
+//                return 0; // 쓰기 권한 있음
+//        }
+//        if(pms == 'x'){ // 실행 권한 확인
+//            if(dirNode->permission[5] == 0)
+//                return -1; // 실행 권한 없음
+//            else
+//                return 0; // 실행 권한 있음
+//        }
+//    }
+//    // 그 외의 경우(다른 사용자)
+//    else{
+//        if(pms == 'r'){ // 읽기 권한 확인
+//            if(dirNode->permission[6] == 0)
+//                return -1; // 읽기 권한 없음
+//            else
+//                return 0; // 읽기 권한 있음
+//        }
+//        if(pms == 'w'){ // 쓰기 권한 확인
+//            if(dirNode->permission[7] == 0)
+//                return -1; // 쓰기 권한 없음
+//            else
+//                return 0; // 쓰기 권한 있음
+//        }
+//        if(pms == 'x'){ // 실행 권한 확인
+//            if(dirNode->permission[8] == 0)
+//                return -1; // 실행 권한 없음
+//            else
+//                return 0; // 실행 권한 있음
+//        }
+//    }
+//    return -1; // 유효하지 않은 권한 요청
+//}
+
+
 
 // 정수 형식의 권한 값을 이진수 배열로 변환하는 함수
 int Atoi_permission(DirectoryNode* dirNode)
@@ -114,3 +151,5 @@ void PrintPermission(DirectoryNode* dirNode)
         }
     }
 }
+
+

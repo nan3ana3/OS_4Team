@@ -5,7 +5,7 @@ CFLAG = -fcommon -w
 SRC_DIR = source
 INCS = include
 
-SRCS = directory.c utility.c main.c permission.c stack.c user.c cat.c cd.c chmod.c chown.c find.c mkdir.c rm.c pwd.c ls.c grep.c
+SRCS = directory.c utility.c main.c permission.c stack.c user.c mkdir.c ls.c cd.c find.c pwd.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(TARGET)
