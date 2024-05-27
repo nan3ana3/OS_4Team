@@ -202,21 +202,26 @@ void Instruction(DirectoryTree* dirTree, char* cmd)
     int check_correct;
 
     DirectoryTree tree;
-    init_directory_tree(&tree);
+    //init_directory_tree(&tree);
+
+    char paths[1024];   // 파일 경로
+    //for 'man'
+    char input[100];
+    char* argv[100]; // 인자를 저장할 배열
+    int argc = 0;    // 인자의 개수
 
     if(strcmp(cmd, "") == 0 || cmd[0] == ' '){ // 명령어가 빈 문자열이거나 공백으로 시작하면 리턴
         return;
     }
     command = strtok(cmd, " "); // 명령어 추출
-     if(strcasecmp(command, "cat") == 0){ // cat 명령어 처리
-         command = strtok(NULL, " ");
-       //  check_correct = 
-         cat(&tree, command);}
+//     if(strcasecmp(command, "cat") == 0){ // cat 명령어 처리
+//         command = strtok(NULL, " ");
+//       check_correct = cat(dirTree, command);
 //         if(check_correct == 0){
 //             SaveDir(dirTree, dStack);
 //         }
 //     }
-     else if(strcasecmp(cmd, "cd") == 0){ // cd 명령어 처리
+     if(strcasecmp(cmd, "cd") == 0){ // cd 명령어 처리
          cmd = strtok(NULL, " ");
          cd(dirTree, cmd);
      }
@@ -262,6 +267,17 @@ void Instruction(DirectoryTree* dirTree, char* cmd)
     //         SaveDir(dirTree, dStack);
     //     }
     // }
+    
+    else if (strcmp(command, "rm") == 0) {
+              rm(&tree, command, paths);
+    }
+    else if(strcasecmp(cmd, "man") == 0) {  // man 명령어 처리
+            cmd = strtok(NULL, " ");
+            man(cmd);
+    }
+    else if(strcasecmp(cmd, "clear") == 0) { // clear 명령어 처리
+            clear();
+    }
     else if(strcasecmp(cmd, "kill") == 0) {
             cmd = strtok(NULL, " ");
             kill_command(cmd);
@@ -273,6 +289,17 @@ void Instruction(DirectoryTree* dirTree, char* cmd)
     else{ // 명령어가 없을 경우 처리
         printf("command not found: %s\n", cmd);
     }
+//    char* token = strtok(input, " ");
+//    while (token != NULL) {
+//    argv[argc++] = token;
+//    token = strtok(NULL, " ");
+//    }
+//    // man 함수 호출
+//    man(&argv, argc);
+//
+//    //clear 함수 호출
+//    clear(input);
+
     return;
 }
 

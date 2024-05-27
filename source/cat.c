@@ -1,4 +1,4 @@
-#include "../include/main.h"
+// #include "../include/main.h"
 
 //void init_directory_tree(DirectoryTree* tree) {
 //    tree->root = (DirectoryNode*)malloc(sizeof(DirectoryNode));
@@ -186,6 +186,8 @@
 //    }
 //}
 
+#include "../include/main.h"
+
 // 채린님이 고친거
 void init_directory_tree(DirectoryTree* tree) {
     tree->root = (DirectoryNode*)malloc(sizeof(DirectoryNode));
@@ -227,8 +229,8 @@ void cat(DirectoryTree* tree, const char* cmd) {
             char filePath[200];
             snprintf(filePath, sizeof(filePath), "%s%s", tree->current->name, tokens[2]);
 
-            FILE* newfile = fopen(filePath, "wt");
-            if (newfile == NULL) {
+            FILE* Directory = fopen(filePath, "wt");
+            if (Directory == NULL) {
                 printf("Error: File creation failed. Path: %s\n", filePath);
                 return;
             }
@@ -244,7 +246,7 @@ void cat(DirectoryTree* tree, const char* cmd) {
 
     else if (strcmp(tokens[1], "-n") == 0) {
         if (tokens[2] == NULL) {
-            printf("Error: 파일 이름을 입력하세요\n");
+            printf("Error: Please enter a file name.\n");
             return;
         }
         char filePath[200];
@@ -278,4 +280,3 @@ void cat(DirectoryTree* tree, const char* cmd) {
         printf("Error: Try another command!\n");
     }
 }
-

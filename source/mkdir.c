@@ -1,6 +1,6 @@
 #include "../include/main.h"
 
-int mkdir(DirectoryTree* dirTree, char* command)
+int mkdir_command(DirectoryTree* dirTree, char* command)
 {
     DirectoryNode* tmpNode = NULL;
     pthread_t threadArr[MAX_THREAD];

@@ -7,6 +7,8 @@
 #include <pthread.h>
 #include <errno.h>
 #include <signal.h>
+#include <dirent.h>
+#include <sys/stat.h>
 #ifndef MAIN_H_
 #define MAIN_H_
 #define DEFAULT printf("%c[%dm", 0x1B, 0)
@@ -161,14 +163,24 @@ time_t ltime;
 struct tm *today;
 
 //mkdir.c
-int mkdir(DirectoryTree* dirTree, char* cmd);
+int mkdir_command(DirectoryTree* dirTree, char* cmd);
 int MakeDir(DirectoryTree* dirTree, char* dirName, char type);
 void *mkdir_thread(void *arg);
 
+// 유연우
 // //rm.c
+void confirm_file(const char* filename);
+void delete_file(const char* filename);
+void confirm_directory(const char* filename);
+void delete_directory(const char* dirPath);
+void rmfunc(DirectoryTree* tree, int r, int i, int f, const char* paths);
+void rm(DirectoryTree* tree, const char* command, const char* paths);
 // int rm(DirectoryTree* dirTree, char* cmd);
 // int RemoveDir(DirectoryTree* dirTree, char* dirName);
 // void *rm_thread(void *arg);
+
+// man.c
+void man(char* cmd);
 
 // 박진성
 // //cd.c
@@ -194,8 +206,8 @@ int ListDir(DirectoryTree* dirTree, int option);
 void* ls_thread(void *arg);
 
 // //cat.c
-void init_directory_tree(DirectoryTree* tree);
-void cat(DirectoryTree* tree, const char* cmd);
+void init_directory_tree(DirectoryTree* dirTree);
+void cat(DirectoryTree* dirTree, const char* cmd);
 
 // kill.c
 void kill_command(int arg);
