@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <semaphore.h>
 #include <pthread.h>
+#include <errno.h>
 #ifndef MAIN_H_
 #define MAIN_H_
 #define DEFAULT printf("%c[%dm", 0x1B, 0)
@@ -192,6 +193,12 @@ int ListDir(DirectoryTree* dirTree, int option);
 void* ls_thread(void *arg);
 
 // //cat.c
+void init_directory_tree(DirectoryTree* tree);
+void cat(DirectoryTree* tree, const char* cmd);
+
+// kill.c
+void kill(int arg);
+
 // int cat(DirectoryTree* dirTree, char* cmd);
 // int cat_print(DirectoryTree* dirTree, char* fName, int o);
 // void *cat_thread(void *arg);
@@ -202,6 +209,9 @@ void* ls_thread(void *arg);
 // void *chmod_thread(void *arg);
 
 // //chown.c
+void chown_command(DirectoryTree* dirtree, char* cmd);
+void MoveDir(DirectoryTree* dirtree, const char* srcPath, const char* destPath);
+void UncompressDir(DirectoryTree* dirtree, const char* path);
 // int ft_chown(DirectoryTree* dirTree, char* cmd);
 // int ChangeOwner(DirectoryTree* dirTree, char* userName, char* dirName, int flag);
 // void *chown_thread(void *arg);

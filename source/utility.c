@@ -201,21 +201,25 @@ void Instruction(DirectoryTree* dirTree, char* cmd)
     char* command;
     int check_correct;
 
+    DirectoryTree tree;
+    init_directory_tree(&tree);
+
     if(strcmp(cmd, "") == 0 || cmd[0] == ' '){ // 명령어가 빈 문자열이거나 공백으로 시작하면 리턴
         return;
     }
     command = strtok(cmd, " "); // 명령어 추출
-    // if(strcasecmp(command, "cat") == 0){ // cat 명령어 처리
-    //     command = strtok(NULL, " ");
-    //     check_correct = cat(dirTree, command);
-    //     if(check_correct == 0){
-    //         SaveDir(dirTree, dStack);
-    //     }
-    // }
-    // else if(strcasecmp(command, "cd") == 0){ // cd 명령어 처리
-    //     command = strtok(NULL, " ");
-    //     cd(dirTree, command);
-    // }
+     if(strcasecmp(command, "cat") == 0){ // cat 명령어 처리
+         command = strtok(NULL, " ");
+       //  check_correct = 
+         cat(&tree, command);}
+//         if(check_correct == 0){
+//             SaveDir(dirTree, dStack);
+//         }
+//     }
+     else if(strcasecmp(cmd, "cd") == 0){ // cd 명령어 처리
+         cmd = strtok(NULL, " ");
+         cd(dirTree, cmd);
+     }
     // else if(strcasecmp(command, "chmod") == 0){ // chmod 명령어 처리
     //     command = strtok(NULL, " ");
     //     check_correct = chmod(dirTree, command);
@@ -223,22 +227,20 @@ void Instruction(DirectoryTree* dirTree, char* cmd)
     //         SaveDir(dirTree, dStack);
     //     }
     // }
-    // else if(strcasecmp(command, "chown") == 0){ // chown 명령어 처리
-    //     command = strtok(NULL, " ");
-    //     check_correct = ft_chown(dirTree, command);
-    //     if(check_correct == 0){
-    //         SaveDir(dirTree, dStack);
-    //     }
-    // }
-    // else if(strcasecmp(command, "find") == 0){ // find 명령어 처리
-    //     command = strtok(NULL, " ");
-    //     find(dirTree, command);
-    // }
-    // else if(strcasecmp(command, "grep") == 0){ // grep 명령어 처리
-    //     command = strtok(NULL, " ");
-    //     grep(dirTree, command);
-    // }
-    if(strcasecmp(command, "ls") == 0){ // ls 명령어 처리
+//     else if(strcasecmp(command, "chown") == 0){ // chown 명령어 처리
+//         command = strtok(NULL, " ");
+//         //check_correct = 
+//         chown_command(dirTree, command);
+////         if(check_correct == 0){
+////             SaveDir(dirTree, dStack);
+////         }
+//     }
+     else if(strcasecmp(cmd, "find") == 0){ // find 명령어 처리
+         cmd = strtok(NULL, " ");
+         find(dirTree, cmd);
+     }
+
+    else if(strcasecmp(command, "ls") == 0){ // ls 명령어 처리
         command = strtok(NULL, " ");
         ls(dirTree, command);
     }
@@ -249,10 +251,10 @@ void Instruction(DirectoryTree* dirTree, char* cmd)
             SaveDir(dirTree, dStack);
         }
     }
-    // else if(strcasecmp(command, "pwd") == 0){ // pwd 명령어 처리
-    //     command = strtok(NULL, " ");
-    //     pwd(dirTree, dStack, command);
-    // }
+     else if(strcasecmp(cmd, "pwd") == 0){ // pwd 명령어 처리
+         cmd = strtok(NULL, " ");
+         pwd(dirTree, cmd);
+     }
     // else if(strcasecmp(command, "rm") == 0){ // rm 명령어 처리
     //     command = strtok(NULL, " ");
     //     check_correct = rm(dirTree, command);
