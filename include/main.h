@@ -6,6 +6,7 @@
 #include <semaphore.h>
 #include <pthread.h>
 #include <errno.h>
+#include <signal.h>
 #ifndef MAIN_H_
 #define MAIN_H_
 #define DEFAULT printf("%c[%dm", 0x1B, 0)
@@ -197,7 +198,7 @@ void init_directory_tree(DirectoryTree* tree);
 void cat(DirectoryTree* tree, const char* cmd);
 
 // kill.c
-void kill(int arg);
+void kill_command(int arg);
 
 // int cat(DirectoryTree* dirTree, char* cmd);
 // int cat_print(DirectoryTree* dirTree, char* fName, int o);

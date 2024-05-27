@@ -1,15 +1,14 @@
-//os 24 kill
+////os 24 kill
 #include "../include/main.h"
 
-void kill(int arg) {
-// int main(){
+void kill_command(int arg) {
 
 	//kill이 실행되면 옵션을 나누는것 하기
 	char input[100];
 	char* tokens[3];
 	int token_count = 0;
 	char* next_token;
-	printf("명령어 입력\n");
+	printf("Enter the command:\n");
 
 	fgets(input, sizeof(input), stdin);
 
@@ -18,10 +17,10 @@ void kill(int arg) {
 		input[len - 1] = '\0';
 	}
 
-	char* token = strtok_s(input, " ", &next_token);
+	char* token = strtok_r(input, " ", &next_token);
 	while (token != NULL && token_count < 3) {
 		tokens[token_count++] = token;
-		token = strtok_s(NULL, " ", &next_token);
+		token = strtok_r(NULL, " ", &next_token);
 	}
 	//tokens[]배열에 띄어쓰기를 기준으로 하나씩 들어가 있도록 한다.
 

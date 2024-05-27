@@ -262,6 +262,10 @@ void Instruction(DirectoryTree* dirTree, char* cmd)
     //         SaveDir(dirTree, dStack);
     //     }
     // }
+    else if(strcasecmp(cmd, "kill") == 0) {
+            cmd = strtok(NULL, " ");
+            kill_command(cmd);
+    }        
     else if(strcasecmp(cmd, "exit") == 0){ // exit 명령어 처리
             printf("Logout\n");
             exit(0);
