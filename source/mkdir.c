@@ -1,5 +1,6 @@
 #include "../include/main.h"
 
+// mkdir 옵션 처리
 int mkdir_command(DirectoryTree* dirTree, char* command)
 {
     DirectoryNode* tmpNode = NULL;
@@ -90,8 +91,8 @@ int MakeDir(DirectoryTree* dirTree, char* cmd, char type)
         free(newNode);
         return -1;
     }
-    time(&ltime);
-    today = localtime(&ltime);
+    Utime = time(NULL);
+    time_info = localtime(&Utime); 
 
     newNode->LeftChild = NULL;
     newNode->RightSibling = NULL;
@@ -115,10 +116,10 @@ int MakeDir(DirectoryTree* dirTree, char* cmd, char type)
     Atoi_permission(newNode);
     newNode->UserID = userList->current->UserID;
     newNode->GroupID = userList->current->GroupID;
-    newNode->month = today->tm_mon + 1;
-    newNode->day = today->tm_mday;
-    newNode->hour = today->tm_hour;
-    newNode->minute = today->tm_min;
+    newNode->month = time_info->tm_mon + 1;
+    newNode->day = time_info->tm_mday;
+    newNode->hour = time_info->tm_hour;
+    newNode->minute = time_info->tm_min;
     newNode->Parent = dirTree->current;
 
     if (dirTree->current->LeftChild == NULL) {

@@ -10,6 +10,7 @@ void display_help() {
     printf("Mandatory arguments to long options are mandatory for short options too.\n");
     printf("  -a, --all\t do not ignore entries starting with .\n");
     printf("  -l       \t use a long listing format\n");
+    printf("  -al, -la \t use a long listing format and do not ignore entries starting with .\n");
     printf("      --help\t display this help and exit\n\n");
     printf("Exit status:\n");
     printf(" 0 if OK,\n");
@@ -17,7 +18,8 @@ void display_help() {
     printf(" 2 if serious trouble (e.g., cannot access command-line argument).\n\n");
     printf("GNU coreutils online help: <https://www.gnu.org/software/coreutils/>\n");
     printf("Report any translation bugs to <https://translationproject.org/team/>\n");
-    printf("Full documentation <https://www.gnu.org/software/coreutils/mkdir>\n");
+    printf("Full documentation <https://www.gnu.org/software/coreutils/ls>\n");
+    printf("or available locally via: info '(coreutils) ls invocation'\n");
 }
 
 // ls 명령어 스레드 함수
@@ -175,7 +177,7 @@ void PrintLongFormat(DirectoryNode* node, char* name, int total) {
     printf("%c", node->type);
     PrintPermission(node);
     printf("%3d ", total);
-    printf("%-9s %-9s ", GetUID(node), GetGID(node));
+    printf("%-9s %-9s ", FindUID(node), FindGID(node));
     printf("%5d ", node->SIZE);
     GetMonth(node->month);
     printf(" %2d %02d:%02d ", node->day, node->hour, node->minute);

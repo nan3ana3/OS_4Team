@@ -1,4 +1,4 @@
-// #include "../include/main.h"
+#include "../include/main.h"
 
 //void init_directory_tree(DirectoryTree* tree) {
 //    tree->root = (DirectoryNode*)malloc(sizeof(DirectoryNode));
@@ -33,7 +33,7 @@
 //
 //    if (strcmp(tokens[1], ">") == 0) {
 //        if (tokens[2] == NULL) {
-//            printf("Error: 파일 이름을 입력하세요\n");
+//            printf("Error: ÆAAI AI?§A≫ AO·ACIŒŒ¿a\n");
 //            return;
 //        }
 //        else {
@@ -43,11 +43,11 @@
 //            FILE* newfile;
 //            errno_t err = fopen_s(&newfile, filePath, "wt");
 //            if (err != 0 || newfile == NULL) {
-//                printf("Error: 파일 생성에 실패했습니다. Path: %s\n", filePath);
+//                printf("Error: ÆAAI ≫yŒº¿¡ œCÆÐCßœA?I?U. Path: %s\n", filePath);
 //                return;
 //            }
 //            else {
-//                printf("입력하세요 (종료: Ctrl+D)\n");
+//                printf("AO·ACIŒŒ¿a (A?·a: Ctrl+D)\n");
 //                while ((word = getchar()) != EOF) {
 //                    fputc(word, newfile);
 //                }
@@ -58,7 +58,7 @@
 //
 //    else if (strcmp(tokens[1], "-n") == 0) {
 //        if (tokens[2] == NULL) {
-//            printf("Error: 파일 이름을 입력하세요\n");
+//            printf("Error: ÆAAI AI?§A≫ AO·ACIŒŒ¿a\n");
 //            return;
 //        }
 //        char filePath[200];
@@ -66,7 +66,7 @@
 //        FILE* file_print;
 //        errno_t err = fopen_s(&file_print, filePath, "r");
 //        if (err != 0 || file_print == NULL) {
-//            printf("Error: 파일 열기에 실패했습니다. Path: %s\n", filePath);
+//            printf("Error: ÆAAI ¿­±a¿¡ œCÆÐCßœA?I?U. Path: %s\n", filePath);
 //            return;
 //        }
 //        int line_number = 1;
@@ -82,7 +82,7 @@
 //        FILE* file_print;
 //        errno_t err = fopen_s(&file_print, filePath, "r");
 //        if (err != 0 || file_print == NULL) {
-//            printf("Error: 파일 열기에 실패했습니다. Path: %s\n", filePath);
+//            printf("Error: ÆAAI ¿­±a¿¡ œCÆÐCßœA?I?U. Path: %s\n", filePath);
 //            return;
 //        }
 //        while (fgets(input, sizeof(input), file_print)) {
@@ -91,12 +91,12 @@
 //        fclose(file_print);
 //    }
 //    else {
-//        printf("Error: 다른 명령어를 시도해보세요!\n");
+//        printf("Error: ?U?￥ ?i·E?i?? œAμμCØº?ŒŒ¿a!\n");
 //    }
 //}
 
 
-//윤주가 고친거
+//A±AO°¡ °iA￡°A
 //void init_directory_tree(DirectoryTree* tree) {
 //    tree->root = (DirectoryNode*)malloc(sizeof(DirectoryNode));
 //    strcpy(tree->root->name, "/");  // strcpy_s -> strcpy
@@ -129,13 +129,13 @@
 //
 //    // Check if we have enough tokens before accessing them
 //    if (token_count < 2) {
-//        printf("Error: 명령어를 확인하세요\n");
+//        printf("Error: ?i·E?i?? E®AICIŒŒ¿a\n");
 //        return;
 //    }
 //
 //    if (strcmp(tokens[1], ">") == 0) {
 //        if (token_count < 3 || tokens[2] == NULL) {
-//            printf("Error: 파일 이름을 입력하세요\n");
+//            printf("Error: ÆAAI AI?§A≫ AO·ACIŒŒ¿a\n");
 //            return;
 //        }
 //        char filePath[200];
@@ -143,10 +143,10 @@
 //
 //        FILE* newfile = fopen(filePath, "wt");
 //        if (newfile == NULL) {
-//            printf("Error: 파일 생성에 실패했습니다. Path: %s\n", filePath);
+//            printf("Error: ÆAAI ≫yŒº¿¡ œCÆÐCßœA?I?U. Path: %s\n", filePath);
 //            return;
 //        } else {
-//            printf("입력하세요 (종료: Ctrl+D)\n");
+//            printf("AO·ACIŒŒ¿a (A?·a: Ctrl+D)\n");
 //            while ((word = getchar()) != EOF) {
 //                fputc(word, newfile);
 //            }
@@ -154,14 +154,14 @@
 //        }
 //    } else if (strcmp(tokens[1], "-n") == 0) {
 //        if (token_count < 3 || tokens[2] == NULL) {
-//            printf("Error: 파일 이름을 입력하세요\n");
+//            printf("Error: ÆAAI AI?§A≫ AO·ACIŒŒ¿a\n");
 //            return;
 //        }
 //        char filePath[200];
 //        snprintf(filePath, sizeof(filePath), "%s%s", tree->current->name, tokens[2]);
 //        FILE* file_print = fopen(filePath, "r");
 //        if (file_print == NULL) {
-//            printf("Error: 파일 열기에 실패했습니다. Path: %s\n", filePath);
+//            printf("Error: ÆAAI ¿­±a¿¡ œCÆÐCßœA?I?U. Path: %s\n", filePath);
 //            return;
 //        }
 //        int line_number = 1;
@@ -174,7 +174,7 @@
 //        snprintf(filePath, sizeof(filePath), "%s%s", tree->current->name, tokens[1]);
 //        FILE* file_print = fopen(filePath, "r");
 //        if (file_print == NULL) {
-//            printf("Error: 파일 열기에 실패했습니다. Path: %s\n", filePath);
+//            printf("Error: ÆAAI ¿­±a¿¡ œCÆÐCßœA?I?U. Path: %s\n", filePath);
 //            return;
 //        }
 //        while (fgets(input, sizeof(input), file_print)) {
@@ -182,16 +182,17 @@
 //        }
 //        fclose(file_print);
 //    } else {
-//        printf("Error: 다른 명령어를 시도해보세요!\n");
+//        printf("Error: ?U?￥ ?i·E?i?? œAμμCØº?ŒŒ¿a!\n");
 //    }
 //}
 
-#include "../include/main.h"
+// A€?°?OAI °iA￡°A
 
-// 채린님이 고친거
+
+
 void init_directory_tree(DirectoryTree* tree) {
     tree->root = (DirectoryNode*)malloc(sizeof(DirectoryNode));
-    strcpy(tree->root->name, "/");
+    strcpy(tree->root->name, ".\\");  // Set root directory as current directory
     tree->root->type = 'd';
     tree->root->Parent = NULL;
     tree->root->LeftChild = NULL;
@@ -199,61 +200,55 @@ void init_directory_tree(DirectoryTree* tree) {
     tree->current = tree->root;
 }
 
-void cat(DirectoryTree* tree, const char* cmd) {
+
+void cat(DirectoryTree* tree, const char* token1, const char* token2) {
     char input[100];
-    char* tokens[5];
-    int token_count = 0;
-    char* next_token;
-    char word;
-    int index = 0;
+    int ch;
 
-    strcpy(input, cmd);
-
-    size_t len = strlen(input);
-    if (len > 0 && input[len - 1] == '\n') {
-        input[len - 1] = '\0';
+    if (token1 == NULL) {
+        printf("Error: No command provided.\n");
+        return;
     }
 
-    char* token = strtok_r(input, " ", &next_token);
-    while (token != NULL && token_count < 5) {
-        tokens[token_count++] = token;
-        token = strtok_r(NULL, " ", &next_token);
-    }
-
-    if (strcmp(tokens[1], ">") == 0) {
-        if (tokens[2] == NULL) {
-            printf("Error: Please enter a file name.\n");
+    if (strcmp(token1, ">") == 0) {
+        if (token2 == NULL) {
+            printf("Error: Enter a file name.\n");
             return;
-        }
-        else {
+        } else {
             char filePath[200];
-            snprintf(filePath, sizeof(filePath), "%s%s", tree->current->name, tokens[2]);
+            snprintf(filePath, sizeof(filePath), "%s%s", tree->current->name, token2);
+            printf("Creating file at path: %s\n", filePath);
 
-            FILE* Directory = fopen(filePath, "wt");
-            if (Directory == NULL) {
-                printf("Error: File creation failed. Path: %s\n", filePath);
+            FILE* newfile = fopen(filePath, "w");
+            if (newfile == NULL) {
+                printf("Error: Failed to create a file. Path: %s\n", filePath);
                 return;
-            }
-            else {
-                printf("Please enter (Close : Ctrl+D)\n");
-                while ((word = getchar()) != EOF) {
-                    fputc(word, newfile);
+            } else {
+                printf("Enter (End: Ctrl+D)\n");
+                while ((ch = getchar()) != EOF) {
+                    fputc(ch, newfile);
                 }
                 fclose(newfile);
+                printf("\nFile created successfully.\n");
+                
+                
+                if(feof(stdin)){
+                clearerr(stdin);
+                }
             }
         }
-    }
-
-    else if (strcmp(tokens[1], "-n") == 0) {
-        if (tokens[2] == NULL) {
-            printf("Error: Please enter a file name.\n");
+    } else if (strcmp(token1, "-n") == 0) {
+        if (token2 == NULL) {
+            printf("Error: Enter a file name.\n");
             return;
         }
         char filePath[200];
-        snprintf(filePath, sizeof(filePath), "%s%s", tree->current->name, tokens[2]);
+        snprintf(filePath, sizeof(filePath), "%s%s", tree->current->name, token2);
+        printf("Opening file at path: %s\n", filePath);
+
         FILE* file_print = fopen(filePath, "r");
         if (file_print == NULL) {
-            printf("Error: Filed to open file. Path: %s\n", filePath);
+            printf("Error: Failed to open a file. Path: %s\n", filePath);
             return;
         }
         int line_number = 1;
@@ -261,22 +256,19 @@ void cat(DirectoryTree* tree, const char* cmd) {
             printf("%d  %s", line_number++, input);
         }
         fclose(file_print);
-    }
-
-    else if (strlen(tokens[1]) > 0) {
+    } else {
         char filePath[200];
-        snprintf(filePath, sizeof(filePath), "%s%s", tree->current->name, tokens[1]);
+        snprintf(filePath, sizeof(filePath), "%s%s", tree->current->name, token1);
+        printf("Opening file at path: %s\n", filePath);
+
         FILE* file_print = fopen(filePath, "r");
         if (file_print == NULL) {
-            printf("Error: Failed to open file. Path: %s\n", filePath);
+            printf("Error: Failed to open a file. Path: %s\n", filePath);
             return;
         }
         while (fgets(input, sizeof(input), file_print)) {
             printf("%s", input);
         }
         fclose(file_print);
-    }
-    else {
-        printf("Error: Try another command!\n");
     }
 }
