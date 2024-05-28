@@ -15,7 +15,7 @@ int main()
         PrintHead(Linux, dStack);
         fgets(cmd, sizeof(cmd), stdin);
         cmd[strlen(cmd)-1] = '\0';
-        Instruction(Linux, cmd);
+        ExecuteCommand(Linux, cmd);
     }
     return 0;
 }

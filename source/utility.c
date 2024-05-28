@@ -196,112 +196,139 @@ void GetWeek(int week)
 }
 
 // 명령어 처리
-void Instruction(DirectoryTree* dirTree, char* cmd)
-{
-    char* command;
-    int check_correct;
-
-    DirectoryTree tree;
-    //init_directory_tree(&tree);
-
-    char paths[1024];   // 파일 경로
-    //for 'man'
-    char input[100];
-    char* argv[100]; // 인자를 저장할 배열
-    int argc = 0;    // 인자의 개수
-
-    if(strcmp(cmd, "") == 0 || cmd[0] == ' '){ // 명령어가 빈 문자열이거나 공백으로 시작하면 리턴
+void ExecuteCommand(DirectoryTree* dirTree, char* cmd) {
+    if (cmd == NULL || *cmd == '\0' || *cmd == ' ') {
         return;
     }
-    command = strtok(cmd, " "); // 명령어 추출
-//     if(strcasecmp(command, "cat") == 0){ // cat 명령어 처리
-//         command = strtok(NULL, " ");
-//       check_correct = cat(dirTree, command);
-//         if(check_correct == 0){
-//             SaveDir(dirTree, dStack);
-//         }
-//     }
-     if(strcasecmp(cmd, "cd") == 0){ // cd 명령어 처리
-         cmd = strtok(NULL, " ");
-         cd(dirTree, cmd);
-     }
-    // else if(strcasecmp(command, "chmod") == 0){ // chmod 명령어 처리
-    //     command = strtok(NULL, " ");
-    //     check_correct = chmod(dirTree, command);
-    //     if(check_correct == 0){
-    //         SaveDir(dirTree, dStack);
-    //     }
-    // }
-//     else if(strcasecmp(command, "chown") == 0){ // chown 명령어 처리
-//         command = strtok(NULL, " ");
-//         //check_correct = 
-//         chown_command(dirTree, command);
+
+    char* token = strtok(cmd, " ");
+    char* argument = strtok(NULL, " ");
+    int result;
+
+    if (strcasecmp(token, "cd") == 0) {
+        cd(dirTree, argument);
+    } else if (strcasecmp(token, "find") == 0) {
+        find(dirTree, argument);
+    } else if (strcasecmp(token, "ls") == 0) {
+        ls(dirTree, argument);
+    } else if (strcasecmp(token, "mkdir") == 0) {
+        result = mkdir(dirTree, argument);
+        if (result == 0) {
+            SaveDir(dirTree, dStack);
+        }
+    } else if (strcasecmp(token, "pwd") == 0) {
+        pwd(dirTree, argument);
+    } else if (strcasecmp(token, "rm") == 0) {
+        rm(dirTree, token, argument);
+    } else if (strcasecmp(token, "man") == 0) {
+        man(argument);
+    } else if (strcasecmp(token, "clear") == 0) {
+        clear();
+    } else if (strcasecmp(token, "kill") == 0) {
+        kill_command(argument);
+    } else if (strcasecmp(token, "exit") == 0) {
+        printf("Logout\n");
+        exit(0);
+    } else {
+        printf("command not found: %s\n", token);
+    }
+}
+//void Instruction(DirectoryTree* dirTree, char* cmd)
+//{
+//    char* command;
+//    int check_correct;
+//
+//    DirectoryTree tree;
+//    //init_directory_tree(&tree);
+//
+//    char paths[1024];   // 파일 경로
+//    //for 'man'
+//    char input[100];
+//    char* argv[100]; // 인자를 저장할 배열
+//    int argc = 0;    // 인자의 개수
+//
+//    if(strcmp(cmd, "") == 0 || cmd[0] == ' '){ // 명령어가 빈 문자열이거나 공백으로 시작하면 리턴
+//        return;
+//    }
+//    command = strtok(cmd, " "); // 명령어 추출
+////     if(strcasecmp(command, "cat") == 0){ // cat 명령어 처리
+////         command = strtok(NULL, " ");
+////       check_correct = cat(dirTree, command);
 ////         if(check_correct == 0){
 ////             SaveDir(dirTree, dStack);
 ////         }
+////     }
+//     if(strcasecmp(cmd, "cd") == 0){ // cd 명령어 처리
+//         cmd = strtok(NULL, " ");
+//         cd(dirTree, cmd);
 //     }
-     else if(strcasecmp(cmd, "find") == 0){ // find 명령어 처리
-         cmd = strtok(NULL, " ");
-         find(dirTree, cmd);
-     }
-
-    else if(strcasecmp(command, "ls") == 0){ // ls 명령어 처리
-        command = strtok(NULL, " ");
-        ls(dirTree, command);
-    }
-    else if(strcasecmp(command, "mkdir") == 0){ // mkdir 명령어 처리
-        command = strtok(NULL, " ");
-        check_correct = mkdir(dirTree, command);
-        if(check_correct == 0){
-            SaveDir(dirTree, dStack);
-        }
-    }
-     else if(strcasecmp(cmd, "pwd") == 0){ // pwd 명령어 처리
-         cmd = strtok(NULL, " ");
-         pwd(dirTree, cmd);
-     }
-    // else if(strcasecmp(command, "rm") == 0){ // rm 명령어 처리
-    //     command = strtok(NULL, " ");
-    //     check_correct = rm(dirTree, command);
-    //     if(check_correct == 0){
-    //         SaveDir(dirTree, dStack);
-    //     }
-    // }
-    
-    else if (strcmp(command, "rm") == 0) {
-              rm(&tree, command, paths);
-    }
-    else if(strcasecmp(cmd, "man") == 0) {  // man 명령어 처리
-            cmd = strtok(NULL, " ");
-            man(cmd);
-    }
-    else if(strcasecmp(cmd, "clear") == 0) { // clear 명령어 처리
-            clear();
-    }
-    else if(strcasecmp(cmd, "kill") == 0) {
-            cmd = strtok(NULL, " ");
-            kill_command(cmd);
-    }        
-    else if(strcasecmp(cmd, "exit") == 0){ // exit 명령어 처리
-            printf("Logout\n");
-            exit(0);
-    }
-    else{ // 명령어가 없을 경우 처리
-        printf("command not found: %s\n", cmd);
-    }
-//    char* token = strtok(input, " ");
-//    while (token != NULL) {
-//    argv[argc++] = token;
-//    token = strtok(NULL, " ");
-//    }
-//    // man 함수 호출
-//    man(&argv, argc);
+//    // else if(strcasecmp(command, "chmod") == 0){ // chmod 명령어 처리
+//    //     command = strtok(NULL, " ");
+//    //     check_correct = chmod(dirTree, command);
+//    //     if(check_correct == 0){
+//    //         SaveDir(dirTree, dStack);
+//    //     }
+//    // }
+////     else if(strcasecmp(command, "chown") == 0){ // chown 명령어 처리
+////         command = strtok(NULL, " ");
+////         //check_correct = 
+////         chown_command(dirTree, command);
+//////         if(check_correct == 0){
+//////             SaveDir(dirTree, dStack);
+//////         }
+////     }
+//     else if(strcasecmp(cmd, "find") == 0){ // find 명령어 처리
+//         cmd = strtok(NULL, " ");
+//         find(dirTree, cmd);
+//     }
 //
-//    //clear 함수 호출
-//    clear(input);
-
-    return;
-}
+//    else if(strcasecmp(command, "ls") == 0){ // ls 명령어 처리
+//        command = strtok(NULL, " ");
+//        ls(dirTree, command);
+//    }
+//    else if(strcasecmp(command, "mkdir") == 0){ // mkdir 명령어 처리
+//        command = strtok(NULL, " ");
+//        check_correct = mkdir(dirTree, command);
+//        if(check_correct == 0){
+//            SaveDir(dirTree, dStack);
+//        }
+//    }
+//     else if(strcasecmp(cmd, "pwd") == 0){ // pwd 명령어 처리
+//         cmd = strtok(NULL, " ");
+//         pwd(dirTree, cmd);
+//     }
+//    // else if(strcasecmp(command, "rm") == 0){ // rm 명령어 처리
+//    //     command = strtok(NULL, " ");
+//    //     check_correct = rm(dirTree, command);
+//    //     if(check_correct == 0){
+//    //         SaveDir(dirTree, dStack);
+//    //     }
+//    // }
+//    
+//    else if (strcmp(command, "rm") == 0) {
+//              rm(&tree, command, paths);
+//    }
+//    else if(strcasecmp(cmd, "man") == 0) {  // man 명령어 처리
+//            cmd = strtok(NULL, " ");
+//            man(cmd);
+//    }
+//    else if(strcasecmp(cmd, "clear") == 0) { // clear 명령어 처리
+//            clear();
+//    }
+//    else if(strcasecmp(cmd, "kill") == 0) {
+//            cmd = strtok(NULL, " ");
+//            kill_command(cmd);
+//    }        
+//    else if(strcasecmp(cmd, "exit") == 0){ // exit 명령어 처리
+//            printf("Logout\n");
+//            exit(0);
+//    }
+//    else{ // 명령어가 없을 경우 처리
+//        printf("command not found: %s\n", cmd);
+//    }
+//
+//    return;
+//}
 
 
 void Start()
