@@ -1,4 +1,4 @@
-root 0 0 2024 5 3 29 10 32 21 /
+root 0 0 2024 5 3 29 11 53 1 /
 yunjoo 1000 1000 2024 5 1 27 8 46 19 /Users/yunjoo
 jinsung 1001 1001 2023 6 6 3 18 0 55 /Users/jinsung
 chaerin 1002 1002 2023 5 1 29 17 44 46 /Users/chaerin
