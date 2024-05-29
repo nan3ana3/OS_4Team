@@ -1,105 +1,187 @@
 #include "../include/main.h"
 
-// 경로에 해당하는 디렉토리 노드를 찾는 함수
-DirectoryNode* IsDir(DirectoryTree* dirtree, const char* path) {
-    DirectoryNode* current = dirtree->root;
-    char path_copy[256];
-    strcpy_s(path_copy, sizeof(path_copy), path);
-    char* context = NULL;
-    char* token = strtok_s(path_copy, "/", &context);
+int ChangeOwner(DirectoryTree* dirTree, char* userName, char* dirName, int flag) {
+    DirectoryNode* tempNode = NULL;
+    UserNode* tempUser = NULL;
 
-    while (token != NULL && current != NULL) {
-        DirectoryNode* child = current->LeftChild;
-        while (child != NULL) {
-            if (strcmp(child->name, token) == 0) {
-                current = child;
-                break;
-            }
-            child = child->RightSibling;
+    tempNode = FindDirectoryNode(dirTree, dirName, 'd');
+    if (tempNode == NULL) {
+        tempNode = FindDirectoryNode(dirTree, dirName, 'f');
+        if (tempNode == NULL) {
+            printf("chown: cannot access '%s': No such file or directory\n", dirName);
+            return -1;
         }
-        if (child == NULL) {
-            current = NULL;
-        }
-        token = strtok_s(NULL, "/", &context);
     }
-    return current;
+
+    tempUser = FindUserNode(userList, userName);
+    if (tempUser == NULL) {
+        printf("chown: invalid user '%s'\n", userName);
+        return -1;
+    }
+
+    if (flag == 0) {
+        tempNode->UserID = tempUser->UserID;
+    }
+    else {
+        tempNode->GroupID = tempUser->GroupID;
+    }
+
+    return 0;
 }
+int ft_chown(DirectoryTree* dirTree, char* cmd) {
+    pthread_t threadPool[MAX_THREAD];
+    ThreadTree threadTree[MAX_THREAD];
 
-void chown_command(DirectoryTree* dirtree, char* cmd) {
-    char* context = NULL;
-    char* command = strtok_s(cmd, " ", &context);
-    if (strcmp(command, "chown") != 0) {
-        printf("Invalid command\n");
-        return;
-    }
+    int thread_count = 0;
+    char* command;
+    char temp[MAX_NAME];
 
-    char* option = strtok_s(NULL, " ", &context);
-    if (strcmp(option, "-d") == 0) {
-        char* path = strtok_s(NULL, "", &context);
-        UncompressDir(dirtree, path);
-        return;
+    if (cmd == NULL || strlen(cmd) == 0) {
+        printf("chown: missing operand11\n");
+        printf("Try 'chown --help' for more information.\n");
+        return -1;
     }
-
-    char* path = strtok_s(NULL, "", &context);
-    DirectoryNode* tmp = IsDir(dirtree, path);
-    if (tmp == NULL) {
-        printf("잘못된 디렉토리\n");
-        return;
-    }
-    char* userContext = NULL;
-    char* User = strtok_s(option, ":", &userContext);
-    char* Group = strtok_s(NULL, "", &userContext);
-    if (User != NULL) {
-        tmp->UserID = atoi(User);
-    }
-    if (Group != NULL) {
-        tmp->GroupID = atoi(Group);
-    }
-}
-
-void MoveDir(DirectoryTree* dirtree, const char* srcPath, const char* destPath) {
-    DirectoryNode* srcNode = IsDir(dirtree, srcPath);
-    DirectoryNode* destNode = IsDir(dirtree, destPath);
-
-    if (srcNode == NULL || destNode == NULL) {
-        printf("소스 또는 대상 디렉토리를 찾을 수 없습니다\n");
-        return;
-    }
-
-    // 현재 부모의 자식 목록에서 srcNode를 제거
-    DirectoryNode* parent = srcNode->Parent;
-    if (parent != NULL) {
-        DirectoryNode* child = parent->LeftChild;
-        DirectoryNode* prev = NULL;
-        while (child != NULL && child != srcNode) {
-            prev = child;
-            child = child->RightSibling;
+    if (cmd[0] == '-') {
+        if (strcmp(cmd, "--help") == 0) {
+            printf("Usage: chown [OPTION]... [OWNER][:[GROUP]] FILE...\n");
+            printf("    Change the owner and/or group of each FILE to OWNER and/or GROUP.\n\n");
+            printf("Examples:\n");
+            printf("  chown root /u\t Change the owner of /u to \"root\".\n");
+            printf("  chown root:staff /u\t Likewise, but also change its group to \"staff\".\n");
+            printf("  chown -hR root /u\t Change the owner of /u and subfiles to \"root\".\n\n");
         }
-        if (child == srcNode) {
-            if (prev == NULL) {
-                parent->LeftChild = srcNode->RightSibling;
+        else {
+            printf("chown: invalid option '%s'\n", cmd);
+            printf("Try 'chown --help' for more information22\n");
+        }
+        return -1;
+    }
+    char* saveptr;
+    command = strtok_r(cmd, " ", &saveptr);
+    if (command == NULL) {
+        printf("Try 'chown --help' for more information.33\n");
+        return -1;
+    }
+    strncpy(temp, command, MAX_NAME);
+    command = strtok_r(NULL, " ", &saveptr);
+    if (command == NULL) {
+        printf("Try 'chown --help' for more information.444\n");
+        return -1;
+    }
+    while (command && thread_count < MAX_THREAD) {
+        threadTree[thread_count].threadTree = dirTree;
+        threadTree[thread_count].username = strdup(temp);
+        threadTree[thread_count++].command = strdup(command);
+        command = strtok_r(NULL, " ", &saveptr);
+    }
+
+    for (int i = 0; i < thread_count; i++) {
+        pthread_create(&threadPool[i], NULL, ChownThread, (void*)&threadTree[i]);
+    }
+    for (int i = 0; i < thread_count; i++) {
+        pthread_join(threadPool[i], NULL);
+        free(threadTree[i].username);
+        free(threadTree[i].command);
+    }
+    return 0;
+}
+void* ChownThread(void* arg) {
+    ThreadTree* threadTree = (ThreadTree*)arg;
+    DirectoryTree* dirTree = threadTree->threadTree;
+    DirectoryNode* tmpNode = NULL;
+    DirectoryNode* currentNode = dirTree->current;
+    char* dirName = threadTree->command;
+    char* username = threadTree->username;
+    char* user_id = NULL;
+    char* group_id = NULL;
+    char tmp_dir[MAX_DIR];
+    char tmp_user[MAX_NAME];
+
+    strncpy(tmp_user, username, MAX_NAME);
+    strncpy(tmp_dir, dirName, MAX_DIR);
+
+
+    user_id = strtok(tmp_user, ":");
+    group_id = strtok(NULL, ":");
+
+    if (user_id == NULL && group_id == NULL) {
+        printf("chown: invalid user: '%s'\n", username);
+        pthread_exit(NULL);
+    }
+
+    if (strcmp(tmp_dir, "/") == 0) {
+        printf("chown: changing ownership of the root directory '/' is not permitted\n");
+        pthread_exit(NULL);
+    }
+
+    if (strstr(tmp_dir, "/") == NULL) {
+        tmpNode = FindDirectoryNode(dirTree, tmp_dir, 'd');
+        if (tmpNode == NULL) {
+            tmpNode = FindDirectoryNode(dirTree, tmp_dir, 'f');
+            if (tmpNode == NULL) {
+                printf("chown: cannot access '%s': No such file or directory\n", tmp_dir);
+                pthread_exit(NULL);
             }
-            else {
-                prev->RightSibling = srcNode->RightSibling;
+        }
+    }
+    else {
+        char* directoryPath = getDirectory(tmp_dir);
+        if (directoryPath == NULL) {
+
+            if (tmp_dir[0] == '/' && strchr(tmp_dir + 1, '/') == NULL) {
+                directoryPath = "/";
+            }
+            else
+            {
+                printf("chown: cannot parse directory path from '%s'\n", tmp_dir);
+                pthread_exit(NULL);
+            }
+        }
+
+        char* fileName = strrchr(tmp_dir, '/');
+        if (fileName != NULL) {
+            fileName++;
+        }
+        else {
+            fileName = tmp_dir;
+        }
+
+        if (ChangeDirectory(dirTree, directoryPath) != 0) {
+            printf("chown: cannot access '%s': No such file or directory\n", directoryPath);
+            free(directoryPath);
+            pthread_exit(NULL);
+        }
+        free(directoryPath);
+
+
+        tmpNode = FindDirectoryNode(dirTree, fileName, 'd');
+        if (tmpNode == NULL) {
+            tmpNode = FindDirectoryNode(dirTree, fileName, 'f');
+            if (tmpNode == NULL) {
+                printf("chown: cannot access '%s': No such file or directory\n", fileName);
+                dirTree->current = currentNode;
+                pthread_exit(NULL);
             }
         }
     }
 
-    // destNode의 자식 목록에 srcNode를 추가
-    srcNode->Parent = destNode;
-    srcNode->RightSibling = destNode->LeftChild;
-    destNode->LeftChild = srcNode;
-}
 
-void UncompressDir(DirectoryTree* dirtree, const char* path) {
-    DirectoryNode* node = IsDir(dirtree, path);
-    if (node == NULL) {
-        printf("디렉토리를 찾을 수 없습니다\n");
-        return;
+    if (HasPermission(tmpNode, 'w') != 0) {
+        printf("chown: changing ownership of '%s': Operation not permitted\n", tmp_dir);
+        dirTree->current = currentNode;
+        pthread_exit(NULL);
     }
 
-    // 더미 구현: 디렉토리가 압축 해제되었다고 출력
-    printf("디렉토리 %s 압축 해제됨\n", path);
 
-    // 실제 압축 해제 로직을 여기서 구현
+    if (user_id != NULL) {
+        ChangeOwner(dirTree, user_id, tmpNode->name, 0);
+    }
+    if (group_id != NULL) {
+        ChangeOwner(dirTree, group_id, tmpNode->name, 1);
+    }
+
+
+    dirTree->current = currentNode;
+
+    pthread_exit(NULL);
 }

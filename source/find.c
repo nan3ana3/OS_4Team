@@ -1,219 +1,118 @@
 #include "../include/main.h"
 
-//#define MAX_THREAD 10
-//#define MAX_LENGTH 1024
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
 
-//directory.h   getDir >> getDirectory
-//char* getDirectory(const char* fullPath) {
-//    char* DirectoryPath = (char*)malloc(MAX_DIR);
-//    if (DirectoryPath == NULL) {
-//        return NULL;  // 메모리 할당 실패 시 NULL 반환
-//    }
-//
-//    // strrchr 함수를 사용하여 경로에서 마지막 '/' 찾기
-//    const char* lastSlash = strrchr(fullPath, '/');
-//    if (lastSlash == NULL || lastSlash == fullPath) {
-//        free(DirectoryPath);
-//        return NULL;  // '/'가 없거나 맨 처음에만 있는 경우
-//    }
-//
-//    // 마지막 '/' 이전까지의 문자열을 복사
-//    int pathLength = lastSlash - fullPath;
-//    strncpy(DirectoryPath, fullPath, pathLength);
-//    DirectoryPath[pathLength] = '\0'; // 문자열 종료 지점 명시
-//
-//    return DirectoryPath;
-//}
-//cd.h에 있는데 directory.h로   isexitdir(함수명) >> FindDirectoryNode
-//DirectoryNode* FindDirectoryNode(DirectoryTree* dirTree, char* dirName, char type) {
-//    DirectoryNode* currentNode = dirTree->current->LeftChild; // 현재 디렉토리의 첫 번째 자식 노드로 설정
-//
-//    // 모든 자식 노드를 탐색
-//    while (currentNode != NULL) {
-//        // 디렉토리 이름과 유형이 일치하면 노드를 반환
-//        if (strcmp(currentNode->name, dirName) == 0 && currentNode->type == type) {
-//            return currentNode;
-//        }
-//        // 다음 형제 노드로 이동
-//        currentNode = currentNode->RightSibling;
-//    }
-//    // 일치하는 노드를 찾지 못하면 NULL 반환
-//    return NULL;
-//}
+//directory.h getDir >> getDirectory
 
+//directory.h (\ubcc0\uc218\uba85, \uc57d\uac04\uc758 \uc218\uc815) \ud568\uc218\uba85 ReadDir\uc5d0\uc11c \ubcc0\uacbd
+int ReadDirectory(DirectoryTree* dirTree, char* line, char* dirName) {
+    char* str; // \ubb38\uc790\uc5f4 \ud3ec\uc778\ud130
+    char firstSegment[MAX_NAME]; // \uccab\ubc88\uc9f8 segment\ub97c \uc800\uc7a5\ud560 \ubc84\ud37c
 
-//cd.h
-//int ChangeDirectory(DirectoryTree* dirTree, char* dirPath) {
-//    // 변수 선언
-//    DirectoryNode* tempNode = NULL;
-//    DirectoryNode* savedNode = dirTree->current;  // 현재 디렉토리 노드를 임시 변수에 저장
-//    char tempPath[MAX_DIR];
-//    char* command = NULL;
-//
-//    // 현재 디렉토리 ('.')일 경우: 아무 작업도 하지 않음
-//    if (strcmp(dirPath, ".") == 0) {
-//        return 0;
-//    }
-//
-//    // 상위 디렉토리로 이동하는 경우 ('..')
-//    if (strcmp(dirPath, "..") == 0) {
-//        if (dirTree->current != dirTree->root) { // 현재 디렉토리가 루트 디렉토리가 아니면 상위 디렉토리로 이동
-//            dirTree->current = dirTree->current->Parent;
-//        }
-//        return 0;
-//    }
-//
-//    // 경로를 tempPath에 복사
-//    strncpy(tempPath, dirPath, MAX_DIR - 1); // 문자열 복사
-//    tempPath[MAX_DIR - 1] = '\0';
-//
-//    // 최상위 디렉토리일 경우
-//    if (strcmp(dirPath, "/") == 0) {
-//        dirTree->current = dirTree->root; // 현재 디렉토리 = 루트 디렉토리
-//        return 0;
-//    }
-//
-//    // 절대 경로인 경우
-//    if (dirPath[0] == '/') {
-//        dirTree->current = dirTree->root; // 현재 디렉토리 = 루트 디렉토리
-//        command = strtok(tempPath + 1, "/"); // 첫번째 디렉토리 이름 추출
-//    }
-//    else {  // 상대 경로인 경우
-//        command = strtok(tempPath, "/"); // 첫번째 디렉토리 이름 추출
-//    }
-//
-//    // 경로를 하나씩 탐색하며 이동
-//    while (command != NULL) {
-//        // 하위 디렉토리로 이동하는 경우
-//        tempNode = FindDirectoryNode(dirTree, command, 'd');// 해당 이름의 디렉토리가 존재하면 이동
-//        if (tempNode != NULL) {
-//            dirTree->current = tempNode;
-//        }
-//        else {
-//            // 디렉토리가 존재하지 않을 경우
-//            dirTree->current = savedNode; // 현재 디렉토리 복원
-//            return -1;
-//        }
-//        command = strtok(NULL, "/");
-//    }
-//
-//    return 0;
-//}
-
-
-//directory.h (변수명, 약간의 수정) 함수명 ReadDir에서 변경
-int ReadDirectory(DirectoryTree* dirTree, char* line, char* dirName)
-{
-    char* str; // 문자열 포인터
-    char firstSegment[MAX_NAME]; // 첫번째 segment를 저장할 버퍼
-    char found = 0;
-
-
-    str = strtok(line, " "); // 문자열을 띄어쓰기 단위로 분리
+    str = strtok(line, " "); // \ubb38\uc790\uc5f4\uc744 \ub744\uc5b4\uc4f0\uae30 \ub2e8\uc704\ub85c \ubd84\ub9ac
     if (str != NULL) {
         strncpy(firstSegment, str, MAX_NAME);
-        firstSegment[MAX_NAME - 1] = '\0'; // 안전한 종료를 위해 널 문자 추가
+        firstSegment[MAX_NAME - 1] = '\0'; // \uc548\uc804\ud55c \uc885\ub8cc\ub97c \uc704\ud574 \ub110 \ubb38\uc790 \ucd94\uac00
     }
 
-    for (int count = 0; count < 10; count++) {  // 10번 반복
-        str = strtok(NULL, " "); // 다음 문자열 분리
+    for (int count = 0; count < 10; count++) {  // 10\ubc88 \ubc18\ubcf5
+        str = strtok(NULL, " "); // \ub2e4\uc74c \ubb38\uc790\uc5f4 \ubd84\ub9ac
     }
-    //마지막 문자열에 해당하는 부분에 도착
-    if (str != NULL) { // 문자열이 남아 있는 경우
-        str[strlen(str) - 1] = '\0'; // 문자열 끝에 NULL 추가, 문자열 종료, 개행문자제거 
-        char* found = strstr(str, dirName);// 대소문자 구분 없이 문자열 검색, 일치하는 부분 문자열의 시작주소 반한
-        if (found) { // dirName과 일치하는 문자열을 찾은 경우
+    // \ub9c8\uc9c0\ub9c9 \ubb38\uc790\uc5f4\uc5d0 \ud574\ub2f9\ud558\ub294 \ubd80\ubd84\uc5d0 \ub3c4\ucc29
+    if (str != NULL) { // \ubb38\uc790\uc5f4\uc774 \ub0a8\uc544 \uc788\ub294 \uacbd\uc6b0
+        str[strlen(str) - 1] = '\0'; // \ubb38\uc790\uc5f4 \ub05d\uc5d0 NULL \ucd94\uac00, \ubb38\uc790\uc5f4 \uc885\ub8cc, \uac1c\ud589\ubb38\uc790\uc81c\uac70 
+        char* found = strstr(str, dirName); // \ubb38\uc790\uc5f4 \uac80\uc0c9, \uc77c\uce58\ud558\ub294 \ubd80\ubd84 \ubb38\uc790\uc5f4\uc758 \uc2dc\uc791\uc8fc\uc18c \ubc18\ud658
+        if (found) { // dirName\uacfc \uc77c\uce58\ud558\ub294 \ubb38\uc790\uc5f4\uc744 \ucc3e\uc740 \uacbd\uc6b0
             if (strcmp(str, "/") == 0) {
-                printf("/%s\n", firstSegment); // 루트 디렉토리인 경우 경로 출력
-            }
-            else {
-                printf("%s/%s\n", found, firstSegment);  //루트 디렉토리가 아닌경우, found와 firstSegment 결합, 경로 출력
+                printf("/%s\n", firstSegment); // \ub8e8\ud2b8 \ub514\ub809\ud1a0\ub9ac\uc778 \uacbd\uc6b0 \uacbd\ub85c \ucd9c\ub825
+            } else {
+                printf("%s/%s\n", found, firstSegment);  // \ub8e8\ud2b8 \ub514\ub809\ud1a0\ub9ac\uac00 \uc544\ub2cc \uacbd\uc6b0, found\uc640 firstSegment \uacb0\ud569, \uacbd\ub85c \ucd9c\ub825
             }
         }
     }
     return 0;
 }
 
-//directory.h (변수명, 약간의 수정) 함수명 FindDir에서 변경
-void FindDirectory(DirectoryTree* dirTree, char* dirName)     //Directory.txt 파일을 열고 지정된 디렉토리 이름을 검색
-{
-    FILE* file = fopen("Directory.txt", "r"); //directory.txt 파일을 읽기모드로 열고
+//directory.h (\ubcc0\uc218\uba85, \uc57d\uac04\uc758 \uc218\uc815) \ud568\uc218\uba85 FindDir\uc5d0\uc11c \ubcc0\uacbd
+void FindDirectory(DirectoryTree* dirTree, char* dirName) {    // Directory.txt \ud30c\uc77c\uc744 \uc5f4\uace0 \uc9c0\uc815\ub41c \ub514\ub809\ud1a0\ub9ac \uc774\ub984\uc744 \uac80\uc0c9
+    FILE* file = fopen("Directory.txt", "r"); // directory.txt \ud30c\uc77c\uc744 \uc77d\uae30\ubaa8\ub4dc\ub85c \uc5f4\uace0
     if (!file) {
         perror("No such file or directory");
         return;
     }
-    char line[MAX_LENGTH]; //파일에서 읽은 각 줄을 저장할 임시 버퍼 
-    while (fgets(line, sizeof(line), file)) { //파일을 한 줄씩 읽고 line에 저장, ReadDirectory를 호출하여 각 line에서 디렉토리 이름을 검색하고 일치하는 경로 출력
+    char line[MAX_LENGTH]; // \ud30c\uc77c\uc5d0\uc11c \uc77d\uc740 \uac01 \uc904\uc744 \uc800\uc7a5\ud560 \uc784\uc2dc \ubc84\ud37c 
+    while (fgets(line, sizeof(line), file)) { // \ud30c\uc77c\uc744 \ud55c \uc904\uc529 \uc77d\uace0 line\uc5d0 \uc800\uc7a5, ReadDirectory\ub97c \ud638\ucd9c\ud558\uc5ec \uac01 line\uc5d0\uc11c \ub514\ub809\ud1a0\ub9ac \uc774\ub984\uc744 \uac80\uc0c9\ud558\uace0 \uc77c\uce58\ud558\ub294 \uacbd\ub85c \ucd9c\ub825
         ReadDirectory(dirTree, line, dirName);
     }
     fclose(file);
 }
 
-
-// 1) 명령어에 '/'가 포함되지 않은 경우, 위치한 현재 디렉토리에서 파일이나 디렉토리 검색
-// 2) 명령어에 '/'가 포함되어 있는 경우, 파일이나 디렉토리 검색
-// 2-1) 경로가 잘못됐을 경우,
-// 2-2) 경로가 올바르나, 파일이나 디렉토리가 없을경우
+// 1) \uba85\ub839\uc5b4\uc5d0 '/'\uac00 \ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uacbd\uc6b0, \uc704\uce58\ud55c \ud604\uc7ac \ub514\ub809\ud1a0\ub9ac\uc5d0\uc11c \ud30c\uc77c\uc774\ub098 \ub514\ub809\ud1a0\ub9ac \uac80\uc0c9
+// 2) \uba85\ub839\uc5b4\uc5d0 '/'\uac00 \ud3ec\ud568\ub418\uc5b4 \uc788\ub294 \uacbd\uc6b0, \ud30c\uc77c\uc774\ub098 \ub514\ub809\ud1a0\ub9ac \uac80\uc0c9
+// 2-1) \uacbd\ub85c\uac00 \uc798\ubabb\ub410\uc744 \uacbd\uc6b0,
+// 2-2) \uacbd\ub85c\uac00 \uc62c\ubc14\ub974\ub098, \ud30c\uc77c\uc774\ub098 \ub514\ub809\ud1a0\ub9ac\uac00 \uc5c6\uc744 \uacbd\uc6b0
 void* FindThread(void* arg) {
-    ThreadTree* threadTree = (ThreadTree*)arg; // 스레드 정보와 명령을 포함하는 구조체
-    DirectoryTree* dirTree = threadTree->threadTree; // 디렉토리 트리 접근
-    char* cmd = threadTree->command; // 실행할 명령
-    char fullPath[MAX_DIR]; // 전체 경로를 저장할 버퍼
-    char* fileName; // 파일 이름
-    char* dirPath; // 디렉토리 경로
-    int dirCheck; // 디렉토리 변경 성공 여부 확인
-    DirectoryNode* currentNode = dirTree->current;
-    strncpy(fullPath, cmd, MAX_DIR); // 명령어에서 전체 경로 복사
-    fullPath[MAX_DIR - 1] = '\0'; // 널 종료 문자 보장
+    ThreadTree* threadTree = (ThreadTree*)arg; // \uc2a4\ub808\ub4dc \uc815\ubcf4\uc640 \uba85\ub839\uc744 \ud3ec\ud568\ud558\ub294 \uad6c\uc870\uccb4
+    DirectoryTree* dirTree = threadTree->threadTree; // \ub514\ub809\ud1a0\ub9ac \ud2b8\ub9ac \uc811\uadfc
+    char* cmd = threadTree->command; // \uc2e4\ud589\ud560 \uba85\ub839
+    char fullPath[MAX_DIR]; // \uc804\uccb4 \uacbd\ub85c\ub97c \uc800\uc7a5\ud560 \ubc84\ud37c
+    char* fileName; // \ud30c\uc77c \uc774\ub984
+    char* dirPath; // \ub514\ub809\ud1a0\ub9ac \uacbd\ub85c
+    int dirCheck; // \ub514\ub809\ud1a0\ub9ac \ubcc0\uacbd \uc131\uacf5 \uc5ec\ubd80 \ud655\uc778
+    DirectoryNode* currentNode = dirTree->current; // \ud604\uc7ac \ub514\ub809\ud1a0\ub9ac \uc704\uce58 \uc800\uc7a5
 
-    // 파일 이름과 디렉토리 경로 분리
+    strncpy(fullPath, cmd, MAX_DIR); // \uba85\ub839\uc5b4\uc5d0\uc11c \uc804\uccb4 \uacbd\ub85c \ubcf5\uc0ac
+    fullPath[MAX_DIR - 1] = '\0'; // \ub110 \uc885\ub8cc \ubb38\uc790 \ubcf4\uc7a5
+
+    // \ud30c\uc77c \uc774\ub984\uacfc \ub514\ub809\ud1a0\ub9ac \uacbd\ub85c \ubd84\ub9ac
     fileName = strrchr(fullPath, '/');
     if (fileName) {
-        fileName++; // '/' 다음 문자로 파일 이름 시작
+        fileName++; // '/' \ub2e4\uc74c \ubb38\uc790\ub85c \ud30c\uc77c \uc774\ub984 \uc2dc\uc791
         dirPath = fullPath;
-        *(fileName - 1) = '\0'; // 파일 이름 앞에서 문자열 종료로 디렉토리 경로 설정
-    }
-    else {
-        fileName = fullPath; // '/'가 없는 경우, 전체 명령이 파일 이름
+        *(fileName - 1) = '\0'; // \ud30c\uc77c \uc774\ub984 \uc55e\uc5d0\uc11c \ubb38\uc790\uc5f4 \uc885\ub8cc\ub85c \ub514\ub809\ud1a0\ub9ac \uacbd\ub85c \uc124\uc815
+    } else {
+        fileName = fullPath; // '/'\uac00 \uc5c6\ub294 \uacbd\uc6b0, \uc804\uccb4 \uba85\ub839\uc774 \ud30c\uc77c \uc774\ub984
         dirPath = ".";
     }
 
-    // 필요한 경우 디렉토리 변경
+    // \ud544\uc694\ud55c \uacbd\uc6b0 \ub514\ub809\ud1a0\ub9ac \ubcc0\uacbd
     if (strcmp(dirPath, ".") != 0) {
         dirCheck = ChangeDirectory(dirTree, dirPath);
         if (dirCheck != 0) {
-            printf("find: '%s': No such file or directory.\n", dirPath);
-            dirTree->current = currentNode;
+            threadTree->found = 0; // \ub514\ub809\ud1a0\ub9ac \ubcc0\uacbd \uc2e4\ud328
             pthread_exit(NULL);
         }
     }
 
-    // 파일 또는 디렉토리 존재 여부 확인
+    // \ud30c\uc77c \ub610\ub294 \ub514\ub809\ud1a0\ub9ac \uc874\uc7ac \uc5ec\ubd80 \ud655\uc778
     if (!FindDirectoryNode(dirTree, fileName, 'd') && !FindDirectoryNode(dirTree, fileName, 'f')) {
-        printf("find: '%s': No such file or directory.\n", fileName);
-        dirTree->current = currentNode;
-        pthread_exit(NULL);
+        threadTree->found = 0; // \ub514\ub809\ud1a0\ub9ac\ub098 \ud30c\uc77c\uc774 \uc5c6\uc74c
+    } else {
+        threadTree->found = 1; // \ub514\ub809\ud1a0\ub9ac\ub098 \ud30c\uc77c\uc774 \uc788\uc74c
+        threadTree->command = strdup(cmd); // \uc804\uccb4 \uba85\ub839\uc5b4 \uc800\uc7a5
     }
 
-    printf("%s\n", cmd); // 검색 결과 출력
-    FindDirectory(dirTree, cmd);
+    // \ud604\uc7ac \ub514\ub809\ud1a0\ub9ac\ub97c \uc774\uc804 \uc0c1\ud0dc\ub85c \ubcf5\uc6d0
+    dirTree->current = currentNode;
     pthread_exit(NULL);
-
 }
-int find(DirectoryTree* dirTree, char* cmd)
-{
-    char* command; //명령어 저장 포인터 
-    pthread_t ThreadArr[MAX_THREAD]; //thread 식별자 배열
-    ThreadTree ThreadTree[MAX_THREAD]; // thread별 작업 정보 배열 / threadtree 구조체 배열
 
-    int ThreadCount = 0; // 생성된 thread 수
-    //find . and find and find -- 인 경우, 현재 디렉토리에서 SearchDir호출
+
+int find(DirectoryTree* dirTree, char* cmd) {
+    pthread_t ThreadArr[MAX_THREAD]; // thread \uc2dd\ubcc4\uc790 \ubc30\uc5f4
+    ThreadTree ThreadTree[MAX_THREAD]; // thread\ubcc4 \uc791\uc5c5 \uc815\ubcf4 \ubc30\uc5f4 / threadtree \uad6c\uc870\uccb4 \ubc30\uc5f4
+    char* command; // \uba85\ub839\uc5b4 \uc800\uc7a5 \ud3ec\uc778\ud130
+    int ThreadCount = 0; // \uc0dd\uc131\ub41c thread \uc218
+
+    // find . and find -- \uc778 \uacbd\uc6b0, \ud604\uc7ac \ub514\ub809\ud1a0\ub9ac\uc5d0\uc11c FindDirectory \ud638\ucd9c
     if (cmd == NULL || strcmp(cmd, ".") == 0 || strcmp(cmd, "--") == 0) {
-        FindDirectory(dirTree, dirTree->current->name); //현재 디렉토리 검색
+        FindDirectory(dirTree, dirTree->current->name); // \ud604\uc7ac \ub514\ub809\ud1a0\ub9ac \uac80\uc0c9
         return 0;
-    }
-    else if (cmd[0] == '-') { //명령어가 대시(-)로 시작하면(옵션인 경우)
-        if (strcmp(cmd, "--help") == 0) {//, 명령어가 --help인지 확인하고 사용법과 옵션에 대한 도움말을 출력
+    } else if (cmd[0] == '-') { // \uba85\ub839\uc5b4\uac00 \ub300\uc2dc(-)\ub85c \uc2dc\uc791\ud558\uba74(\uc635\uc158\uc778 \uacbd\uc6b0)
+        if (strcmp(cmd, "--help") == 0) { // \uba85\ub839\uc5b4\uac00 --help\uc778\uc9c0 \ud655\uc778\ud558\uace0 \uc0ac\uc6a9\ubc95\uacfc \uc635\uc158\uc5d0 \ub300\ud55c \ub3c4\uc6c0\ub9d0\uc744 \ucd9c\ub825
             printf("Usage: find [OPTION] [path...] [expression]\n\n");
             printf("    Search for files in a directory hierarchy.\n\n");
             printf("    Options:\n");
@@ -223,33 +122,42 @@ int find(DirectoryTree* dirTree, char* cmd)
             printf("default path is the current directory; default expression is -print\n");
 
             return -1;
-        }
-        else {  //유효하지 않은 옵션인 경우 오류메세지와 도움말 출력
+        } else { // \uc720\ud6a8\ud558\uc9c0 \uc54a\uc740 \uc635\uc158\uc778 \uacbd\uc6b0 \uc624\ub958 \uba54\uc138\uc9c0\uc640 \ub3c4\uc6c0\ub9d0 \ucd9c\ub825
             char* invalid_option = strchr(cmd, '-');
-            printf("find: unknown predicate '%s'\n", invalid_option);  // 오류 메시지
-            printf("Try 'find --help' for more information.\n");  // 도움말 안내
+            printf("find: unknown predicate '%s'\n", invalid_option); // \uc624\ub958 \uba54\uc2dc\uc9c0
+            printf("Try 'find --help' for more information.\n"); // \ub3c4\uc6c0\ub9d0 \uc548\ub0b4
             return -1;
         }
-    }
-    else //threadTree 배열을 반복하며, 각 명령어에 대해 새로운 스레드를 생성하고(pthread_create), 각 스레드가 완료될 때까지 기다림(pthread_join).
-    {
-        command = strtok(cmd, " "); //cmd에서 첫 번째 명령어 분리
-        ThreadTree[ThreadCount].threadTree = dirTree; // 현재 디렉토리 트리 설정
-        ThreadTree[ThreadCount++].command = cmd; //첫 번째 명령어 설정
-    }
-    while (command != NULL) {   // 명령어가 남아있는 동안 반복 ( //멀티스레드 작업을 위해 파일이름마다 스레드배열안에 정보를 저장)
-        ThreadTree[ThreadCount].threadTree = dirTree; // 현재 디렉토리 트리 설정
-        ThreadTree[ThreadCount++].command = command; // 명령어 설정
-        command = strtok(NULL, " "); // 다음 명령어 분리
-    }
-    for (int i = 0; i < ThreadCount; i++) { // 모든 스레드를 생성
-        pthread_create(&ThreadArr[i], NULL, FindThread, (void*)&ThreadTree[i]);
-    }
-    for (int i = 0; i < ThreadCount; i++) { // 모든 스레드가 종료될 때까지 기다림
-        pthread_join(ThreadArr[i], NULL);
+    } else { // threadTree \ubc30\uc5f4\uc744 \ubc18\ubcf5\ud558\uba70, \uac01 \uba85\ub839\uc5b4\uc5d0 \ub300\ud574 \uc0c8\ub85c\uc6b4 \uc2a4\ub808\ub4dc\ub97c \uc0dd\uc131\ud558\uace0(pthread_create), \uac01 \uc2a4\ub808\ub4dc\uac00 \uc644\ub8cc\ub420 \ub54c\uae4c\uc9c0 \uae30\ub2e4\ub9bc(pthread_join).
+        char* saveptr;
+        command = strtok_r(cmd, " ", &saveptr); // cmd\uc5d0\uc11c \uccab \ubc88\uc9f8 \uba85\ub839\uc5b4 \ubd84\ub9ac
+        while (command != NULL && ThreadCount < MAX_THREAD) { // \uba85\ub839\uc5b4\uac00 \ub0a8\uc544\uc788\ub294 \ub3d9\uc548 \ubc18\ubcf5
+            ThreadTree[ThreadCount].threadTree = dirTree; // \ud604\uc7ac \ub514\ub809\ud1a0\ub9ac \ud2b8\ub9ac \uc124\uc815
+            ThreadTree[ThreadCount].command = strdup(command); // \uba85\ub839\uc5b4 \uc124\uc815
+            ThreadTree[ThreadCount].found = -1; // \ucd08\uae30 \uc0c1\ud0dc\ub97c \uc124\uc815
+            pthread_create(&ThreadArr[ThreadCount], NULL, FindThread, (void*)&ThreadTree[ThreadCount]);
+            ThreadCount++;
+            command = strtok_r(NULL, " ", &saveptr); // \ub2e4\uc74c \uba85\ub839\uc5b4 \ubd84\ub9ac
+        }
+
+        // \ubaa8\ub4e0 \uc2a4\ub808\ub4dc\ub97c \uc0dd\uc131\ud55c \ud6c4, \uac01 \uc2a4\ub808\ub4dc\uc758 \uc885\ub8cc\ub97c \uae30\ub2e4\ub9bc
+        for (int i = 0; i < ThreadCount; i++) {
+            pthread_join(ThreadArr[i], NULL);
+        }
+
+        // \ubaa8\ub4e0 \uc2a4\ub808\ub4dc\uac00 \uc644\ub8cc\ub41c \ud6c4, \uc2e4\uc81c \ucd9c\ub825\uc744 \uc218\ud589
+        for (int i = 0; i < ThreadCount; i++) {
+            if (ThreadTree[i].found == 1) {
+                printf("%s\n", ThreadTree[i].command);
+                FindDirectory(dirTree, ThreadTree[i].command); // \ub514\ub809\ud1a0\ub9ac\uac00 \uc788\ub294 \uacbd\uc6b0 \uacbd\ub85c \uac80\uc0c9 \ubc0f \ucd9c\ub825
+            } else if (ThreadTree[i].found == 0) {
+                printf("find: '%s': No such file or directory.\n", ThreadTree[i].command);
+            }
+           
+            free(ThreadTree[i].command); // strdup\ub85c \ud560\ub2f9\ub41c \uba54\ubaa8\ub9ac \ud574\uc81c
+        }
     }
 
     return 0;
-
-
 }
+

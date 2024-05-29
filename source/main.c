@@ -12,7 +12,7 @@ int main()
     SaveUserList(userList);
 
     while(1){
-        PrintHead(Linux, dStack);
+        PrintHead(Linux,dStack);
         fgets(cmd, sizeof(cmd), stdin);
         cmd[strlen(cmd)-1] = '\0';
         ExecuteCommand(Linux, cmd);

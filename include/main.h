@@ -145,6 +145,7 @@ typedef struct ThreadTree {
     int mode;
     int option;
     char* content;
+    int found;
 } ThreadTree;
 
 
@@ -222,9 +223,10 @@ void kill_command(char* command, char* pid);
 // void *chmod_thread(void *arg);
 
 // //chown.c
-void chown_command(DirectoryTree* dirtree, char* cmd);
-void MoveDir(DirectoryTree* dirtree, const char* srcPath, const char* destPath);
-void UncompressDir(DirectoryTree* dirtree, const char* path);
+int ChangeOwner(DirectoryTree* dirTree, char* userName, char* dirName, int flag);
+int ft_chown(DirectoryTree* dirTree, char* cmd);
+void* ChownThread(void* arg);
+
 // int ft_chown(DirectoryTree* dirTree, char* cmd);
 // int ChangeOwner(DirectoryTree* dirTree, char* userName, char* dirName, int flag);
 // void *chown_thread(void *arg);
@@ -246,24 +248,17 @@ void FindDirectory(DirectoryTree* dirTree, char* dirName);
 // int grep(DirectoryTree* dirTree, char* cmd);
 
 //utility.c
-void PrintPrompt(DirectoryTree* dirTree);
+
+//utility.c
 void DestroyNode(DirectoryNode* dirNode);
-void GetMonth(int month);
-void GetWeek(int week);
-void Start();
-char* PrintDirectoryPath(DirectoryTree* dirTree); //pwd.h
-char* PrintParentDirectoryPath(DirectoryTree* dirTree, DirectoryNode* dirNode);
-void WriteNode(DirectoryTree* dirTree, DirectoryNode* dirNode);
+void getPath(DirectoryTree* dirTree, DirectoryNode* dirNode, Stack* dirStack);
+void WriteNode(DirectoryTree* dirTree, DirectoryNode* dirNode, Stack* dirStack);
 int ReadNode(DirectoryTree* dirTree, char* tmp);
-//void DestroyNode(DirectoryNode* dirNode);
-//void getPath(DirectoryTree* dirTree, DirectoryNode* dirNode, Stack* dirStack);
-//void WriteNode(DirectoryTree* dirTree, DirectoryNode* dirNode, Stack* dirStack);
-//int ReadNode(DirectoryTree* dirTree, char* tmp);
-//void GetMonth(int i);
-//void GetWeek(int i);
-//void Instruction(DirectoryTree* dirTree, char* cmd);
-//void Start();
-//void PrintHead(DirectoryTree* dirTree, Stack* dirStack);
+void GetMonth(int i);
+void GetWeek(int i);
+void ExecuteCommand(DirectoryTree* dirTree, char* cmd);
+void Start();
+void PrintHead(DirectoryTree* dirTree, Stack* dirStack);
 
 //permission.c
 int HasPermission(DirectoryNode* dirNode, char o);
@@ -287,6 +282,7 @@ DirectoryTree* LoadDir();
 
 //user.c
 UserList* InitializeUser();
+UserNode* FindUserNode(UserList* userList, char* userName);
 void WriteUser(UserList* userList, UserNode* userNode);
 void SaveUserList(UserList* userList);
 int ReadUser(UserList* userList, char* tmp);
@@ -295,6 +291,15 @@ UserNode* IsExistUser(UserList* userList, char* userName);
 char* GetUID(DirectoryNode* dirNode);
 char* GetGID(DirectoryNode* dirNode);
 void Login(UserList* userList, DirectoryTree* dirTree);
+//UserList* InitializeUser();
+//void WriteUser(UserList* userList, UserNode* userNode);
+//void SaveUserList(UserList* userList);
+//int ReadUser(UserList* userList, char* tmp);
+//UserList* LoadUserList();
+//UserNode* IsExistUser(UserList* userList, char* userName);
+//char* GetUID(DirectoryNode* dirNode);
+//char* GetGID(DirectoryNode* dirNode);
+//void Login(UserList* userList, DirectoryTree* dirTree);
 
 //stack.c
 int IsEmpty(Stack* dirStack);

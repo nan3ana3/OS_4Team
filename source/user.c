@@ -189,6 +189,21 @@ char* GetGID(DirectoryNode* dirNode)
     return tmpNode->name;
 }
 
+UserNode* FindUserNode(UserList* userList, char* userName)
+{
+    UserNode* currentNode = userList->head;
+    // 모든 노드를 탐색
+    while (currentNode != NULL) {
+        if (strcmp(currentNode->name, userName) == 0) {
+            return currentNode;
+        }
+        // 다음 노드로 이동
+        currentNode = currentNode->link;
+    }
+    // 일치하는 노드를 찾지 못하면 NULL 반환
+    return NULL;
+}
+
 // 사용자 로그인 함수
 void Login(UserList* userList, DirectoryTree* dirTree)
 {
