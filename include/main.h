@@ -246,15 +246,24 @@ void FindDirectory(DirectoryTree* dirTree, char* dirName);
 // int grep(DirectoryTree* dirTree, char* cmd);
 
 //utility.c
+void PrintPrompt(DirectoryTree* dirTree);
 void DestroyNode(DirectoryNode* dirNode);
-void getPath(DirectoryTree* dirTree, DirectoryNode* dirNode, Stack* dirStack);
-void WriteNode(DirectoryTree* dirTree, DirectoryNode* dirNode, Stack* dirStack);
-int ReadNode(DirectoryTree* dirTree, char* tmp);
-void GetMonth(int i);
-void GetWeek(int i);
-void Instruction(DirectoryTree* dirTree, char* cmd);
+void GetMonth(int month);
+void GetWeek(int week);
 void Start();
-void PrintHead(DirectoryTree* dirTree, Stack* dirStack);
+char* PrintDirectoryPath(DirectoryTree* dirTree); //pwd.h
+char* PrintParentDirectoryPath(DirectoryTree* dirTree, DirectoryNode* dirNode);
+void WriteNode(DirectoryTree* dirTree, DirectoryNode* dirNode);
+int ReadNode(DirectoryTree* dirTree, char* tmp);
+//void DestroyNode(DirectoryNode* dirNode);
+//void getPath(DirectoryTree* dirTree, DirectoryNode* dirNode, Stack* dirStack);
+//void WriteNode(DirectoryTree* dirTree, DirectoryNode* dirNode, Stack* dirStack);
+//int ReadNode(DirectoryTree* dirTree, char* tmp);
+//void GetMonth(int i);
+//void GetWeek(int i);
+//void Instruction(DirectoryTree* dirTree, char* cmd);
+//void Start();
+//void PrintHead(DirectoryTree* dirTree, Stack* dirStack);
 
 //permission.c
 int HasPermission(DirectoryNode* dirNode, char o);

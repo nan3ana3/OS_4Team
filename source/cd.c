@@ -147,10 +147,19 @@ int cd(DirectoryTree* dirTree, char* cmd) {
     int check;
     // 현재 경로를 저장하여 이전에 위치한 경로로 사용
     currentPath = PrintDirectoryPath(dirTree);
-    // 자신의 홈 디렉토리로 이동
-    if (cmd == NULL || strcmp(cmd, "~") == 0) {
+    // cmd . or cmd 
+    if (cmd == NULL || strcmp(cmd, ".") == 0) {
+        check = ChangeDirectory(dirTree, cmd);
+    } //cmd ~ : 홈 디렉토리로 이동
+    else if (strcmp(cmd, "~") == 0) {
         strcpy(temp, userList->current->dir);
         check = ChangeDirectory(dirTree, temp);
+    }
+    else if (strcmp(cmd, "/") == 0) {
+        check = ChangeDirectory(dirTree, cmd);
+    }
+    else if (strcmp(cmd, "..") == 0) {
+        check = ChangeDirectory(dirTree, cmd);
     }
     else if (cmd[0] == '-') //옵션이 있을경우 
     {
@@ -165,7 +174,7 @@ int cd(DirectoryTree* dirTree, char* cmd) {
             printf("       /     Change to the root directory\n");
             printf("       .     Remain in the current directory\n");
             printf("       ..    Move up to the parent directory\n");
-            printf("       --help     display this help and exit\n");
+            printf("       ?help     display this help and exit\n");
             free(currentPath);
             return 0;
         }
@@ -181,9 +190,9 @@ int cd(DirectoryTree* dirTree, char* cmd) {
         }
         else
         {
-            cmd = strtok(cmd, "-");     // 그 외의 옵션들 에러 처리
+            // 그 외의 옵션들 에러 처리
             printf("bash: cd: %s: invalid option\n", cmd);
-            printf("Try 'cd --help' for more information.\n");
+            printf("Try 'cd ?help' for more information.\n");
             free(currentPath);
             return -1;
 
@@ -219,5 +228,6 @@ int cd(DirectoryTree* dirTree, char* cmd) {
 
     return 0;
 }
+
 
 
