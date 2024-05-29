@@ -279,7 +279,14 @@ void ExecuteCommand(DirectoryTree* dirTree, char* cmd) {
             clear();
     }
         
-        
+
+    else if(strcasecmp(command, "rm") == 0){
+        command = strtok(NULL, " ");
+        check_correct = rm(dirTree, command);
+        if(check_correct == 0){
+            SaveDir(dirTree, dStack);
+        }
+    }
 
        else if(strcasecmp(cmd, "exit") == 0){ // exit 명령어 처리
             printf("Logout\n");
@@ -363,7 +370,7 @@ void PrintHead(DirectoryTree* dirTree, Stack* dirStack)
         user = '$'; // 일반 사용자일 경우
 
     BOLD;GREEN; // 글자 색상 설정
-    printf("%s@2-os-linux", userList->current->name); // 사용자 이름 출력
+    printf("%s@4team_linux", userList->current->name); // 사용자 이름 출력
     DEFAULT; // 글자 색상 초기화
     printf(":");
     tmpNode = dirTree->current;

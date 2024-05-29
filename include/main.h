@@ -170,12 +170,12 @@ void *mkdir_thread(void *arg);
 
 // 유연우
 // //rm.c
-void confirm_file(const char* filename);
-void delete_file(const char* filename);
-void confirm_directory(const char* filename);
-void delete_directory(const char* dirPath);
-void rmfunc(DirectoryTree* tree, int r, int i, int f, const char* paths);
-void rm(DirectoryTree* tree, const char* command, const char* paths);
+//void confirm_file(const char* filename);
+//void delete_file(const char* filename);
+//void confirm_directory(const char* filename);
+//void delete_directory(const char* dirPath);
+//void rmfunc(DirectoryTree* tree, int r, int i, int f, const char* paths);
+//void rm(DirectoryTree* tree, const char* command, const char* paths);
 // int rm(DirectoryTree* dirTree, char* cmd);
 // int RemoveDir(DirectoryTree* dirTree, char* dirName);
 // void *rm_thread(void *arg);
@@ -241,11 +241,9 @@ void FindDirectory(DirectoryTree* dirTree, char* dirName);
 // void FindDir(DirectoryTree* dirTree, char* dirName);
 // void *find_thread(void *arg);
 
-
-// //grep.c
-// int grep_print(DirectoryTree* dirTree, char *search, char* fName, int o);
-// void *grep_thread(void *arg);
-// int grep(DirectoryTree* dirTree, char* cmd);
+int rm(DirectoryTree* dirTree, char* cmd);
+int RemoveDir(DirectoryTree* dirTree, char* dirName);
+void *rm_thread(void *arg);
 
 //utility.c
 

@@ -44,18 +44,18 @@ DirectoryNode* FindDirectoryNode(DirectoryTree* dirTree, char* dirName, char typ
     return NULL;
 }
 
-//DirectoryNode* IsExistDir(DirectoryTree* dirTree, char* dirName, char type)
-//{
-//    DirectoryNode* returnNode = NULL;
-//
-//    returnNode = dirTree->current->LeftChild;
-//    while(returnNode != NULL){
-//        if(strcasecmp(returnNode->name, dirName) == 0 && returnNode->type == type)
-//            break;
-//        returnNode = returnNode->RightSibling;
-//    }
-//    return returnNode;
-//}
+DirectoryNode* IsExistDir(DirectoryTree* dirTree, char* dirName, char type)
+{
+    DirectoryNode* returnNode = NULL;
+
+    returnNode = dirTree->current->LeftChild;
+    while(returnNode != NULL){
+        if(strcasecmp(returnNode->name, dirName) == 0 && returnNode->type == type)
+            break;
+        returnNode = returnNode->RightSibling;
+    }
+    return returnNode;
+}
 
 
 char* getDirectory(const char* fullPath) {
