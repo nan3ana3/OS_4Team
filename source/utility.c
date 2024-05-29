@@ -1,5 +1,85 @@
 #include "../include/main.h"
 
+void WriteNode(DirectoryTree* dirTree, DirectoryNode* dirNode) {
+    fprintf(Directory, "%s %c %d ", dirNode->name, dirNode->type, dirNode->mode);
+    fprintf(Directory, "%d %d %d %d %d %d %d ", dirNode->SIZE, dirNode->UserID, dirNode->GroupID, dirNode->month, dirNode->day, dirNode->hour, dirNode->minute);
+
+    if (dirNode == dirTree->root) //주어진 노드가 루트 노드일 경우
+        fprintf(Directory, "\n");
+    // 부모 노드의 경로 출력
+    else {
+        char* Parentpath = PrintParentDirectoryPath(dirTree, dirNode);
+        if (Parentpath != NULL) {
+            fprintf(Directory, "%s\n", Parentpath);
+            free(Parentpath);  // 경로 문자열 메모리 해제
+        }
+    }
+    if (dirNode->RightSibling != NULL) {
+        WriteNode(dirTree, dirNode->RightSibling);
+    }
+    if (dirNode->LeftChild != NULL) {
+        WriteNode(dirTree, dirNode->LeftChild);
+    }
+}
+
+int ReadNode(DirectoryTree* dirTree, char* tmp) //그대로 사용
+{
+    DirectoryNode* NewNode = (DirectoryNode*)malloc(sizeof(DirectoryNode));
+    DirectoryNode* tmpNode = NULL;
+    char* command;
+
+    NewNode->LeftChild = NULL;
+    NewNode->RightSibling = NULL;
+    NewNode->Parent = NULL;
+
+    command = strtok(tmp, " ");
+    strncpy(NewNode->name, command, MAX_NAME);
+    command = strtok(NULL, " ");
+    NewNode->type = command[0];
+    command = strtok(NULL, " ");
+    NewNode->mode = atoi(command);
+    Atoi_permission(NewNode);
+    command = strtok(NULL, " ");
+    NewNode->SIZE = atoi(command);
+    command = strtok(NULL, " ");
+    NewNode->UserID = atoi(command);
+    command = strtok(NULL, " ");
+    NewNode->GroupID = atoi(command);
+    command = strtok(NULL, " ");
+    NewNode->month = atoi(command);
+    command = strtok(NULL, " ");
+    NewNode->day = atoi(command);
+    command = strtok(NULL, " ");
+    NewNode->hour = atoi(command);
+    command = strtok(NULL, " ");
+    NewNode->minute = atoi(command);
+
+    command = strtok(NULL, " ");
+    if (command != NULL) {
+        command[strlen(command) - 1] = '\0';
+        ChangeDirectory(dirTree, command);
+        NewNode->Parent = dirTree->current;
+
+        if (dirTree->current->LeftChild == NULL) {
+            dirTree->current->LeftChild = NewNode;
+        }
+        else {
+            tmpNode = dirTree->current->LeftChild;
+
+            while (tmpNode->RightSibling != NULL)
+                tmpNode = tmpNode->RightSibling;
+
+            tmpNode->RightSibling = NewNode;
+        }
+    }
+    else {
+        dirTree->root = NewNode;
+        dirTree->current = dirTree->root;
+    }
+
+    return 0;
+}
+
 
 // 명령어 처리
 void ExecuteCommand(DirectoryTree* dirTree, char* cmd) {
@@ -216,7 +296,7 @@ void Start()
     printf("Last login: ");
     GetWeek(userList->current->wday);
     GetMonth(userList->current->month);
-    printf("%d %02d:%02d:%02d %d\n", userList->current->mday, userList->current->hour, userList->current->minute, userList->current->sec, userList->current->year);
+    printf("%d %02d:%02d:%02d %d\n", userList->current->wday, userList->current->hour, userList->current->minute, userList->current->sec, userList->current->year);
 }
 
 //pwd.h
@@ -257,85 +337,5 @@ char* PrintParentDirectoryPath(DirectoryTree* dirTree, DirectoryNode* dirNode) {
     else {
         return PrintParentDirectoryPath(dirTree, dirNode->Parent);
     }
-}
-
-void WriteNode(DirectoryTree* dirTree, DirectoryNode* dirNode) {
-    fprintf(Directory, "%s %c %d ", dirNode->name, dirNode->type, dirNode->mode);
-    fprintf(Directory, "%d %d %d %d %d %d %d ", dirNode->SIZE, dirNode->UserID, dirNode->GroupID, dirNode->month, dirNode->day, dirNode->hour, dirNode->minute);
-
-    if (dirNode == dirTree->root) //주어진 노드가 루트 노드일 경우
-        fprintf(Directory, "\n");
-    // 부모 노드의 경로 출력
-    else {
-        char* Parentpath = PrintParentDirectoryPath(dirTree, dirNode);
-        if (Parentpath != NULL) {
-            fprintf(Directory, "%s\n", Parentpath);
-            free(Parentpath);  // 경로 문자열 메모리 해제
-        }
-    }
-    if (dirNode->RightSibling != NULL) {
-        WriteNode(dirTree, dirNode->RightSibling);
-    }
-    if (dirNode->LeftChild != NULL) {
-        WriteNode(dirTree, dirNode->LeftChild);
-    }
-}
-
-int ReadNode(DirectoryTree* dirTree, char* tmp) //그대로 사용
-{
-    DirectoryNode* NewNode = (DirectoryNode*)malloc(sizeof(DirectoryNode));
-    DirectoryNode* tmpNode = NULL;
-    char* command;
-
-    NewNode->LeftChild = NULL;
-    NewNode->RightSibling = NULL;
-    NewNode->Parent = NULL;
-
-    command = strtok(tmp, " ");
-    strncpy(NewNode->name, command, MAX_NAME);
-    command = strtok(NULL, " ");
-    NewNode->type = command[0];
-    command = strtok(NULL, " ");
-    NewNode->mode = atoi(command);
-    Atoi_permission(NewNode);
-    command = strtok(NULL, " ");
-    NewNode->SIZE = atoi(command);
-    command = strtok(NULL, " ");
-    NewNode->UserID = atoi(command);
-    command = strtok(NULL, " ");
-    NewNode->GroupID = atoi(command);
-    command = strtok(NULL, " ");
-    NewNode->month = atoi(command);
-    command = strtok(NULL, " ");
-    NewNode->day = atoi(command);
-    command = strtok(NULL, " ");
-    NewNode->hour = atoi(command);
-    command = strtok(NULL, " ");
-    NewNode->minute = atoi(command);
-
-    command = strtok(NULL, " ");
-    if (command != NULL) {
-        command[strlen(command) - 1] = '\0';
-        ChangeDirectory(dirTree, command);
-        NewNode->Parent = dirTree->current;
-
-        if (dirTree->current->LeftChild == NULL) {
-            dirTree->current->LeftChild = NewNode;
-        }
-        else {
-            tmpNode = dirTree->current->LeftChild;
-
-            while (tmpNode->RightSibling != NULL)
-                tmpNode = tmpNode->RightSibling;
-
-            tmpNode->RightSibling = NewNode;
-        }
-    }
-    else {
-        dirTree->root = NewNode;
-        dirTree->current = dirTree->root;
-    }
-
-    return 0;
 }
 
